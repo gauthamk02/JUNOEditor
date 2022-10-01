@@ -5,6 +5,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import cv2
+from ImageProcessing import Processing as ip
 
 INIT_VAL = 100
 MAX_VAL = 100
@@ -25,28 +26,18 @@ class JUNOEditor(QWidget):
         self.imageBlue = cv2.imread(BLUE_IMG, 0)
         self.imageGreen = cv2.imread(GREEN_IMG, 0)
         self.imageRed = cv2.imread(RED_IMG, 0)
+        
+        self.img_rgb = np.zeros((self.imageBlue.shape[0], self.imageBlue.shape[1], 3), dtype=np.uint8)
+        self.img_rgb[:, :, 0] = self.imageRed[:, :]
+        self.img_rgb[:, :, 1] = self.imageGreen[:, :]
+        self.img_rgb[:, :, 2] = self.imageBlue[:, :]
 
         self.init_layout()
 
-    def get_image(self):
-
-        b = self.imageBlue.copy()
-        g = self.imageGreen.copy()
-        r = self.imageRed.copy()
-        
-        rgb = np.zeros((b.shape[0], b.shape[1], 3), dtype=np.uint8)
-        rgb[:, :, 0] = r[:, :] * (self.r_val / 100)
-        rgb[:, :, 1] = g[:, :] * (self.g_val / 100)
-        rgb[:, :, 2] = b[:, :] * (self.b_val / 100)
-
-        return rgb
-        
-
     def updateImage(self):
-        img = self.get_image()
+        img = ip.channel_correction(self.img_rgb.copy(), (0, 1, 2), (self.r_val / 100, self.g_val / 100, self.b_val / 100))
         image = QImage(img, img.shape[1], img.shape[0], img.strides[0], QImage.Format_RGB888)
         self.pic.setPixmap(QPixmap.fromImage(image))
-        # print("updateImage")
 
     def valuechange(self):
         self.r_val = self.sl1.value()
@@ -95,8 +86,7 @@ class JUNOEditor(QWidget):
 
         self.pic = QLabel()
         self.pic.setAlignment(Qt.AlignCenter)
-        img = self.get_image()
-        image = QImage(img, img.shape[1], img.shape[0], img.strides[0], QImage.Format_RGB888)
+        image = QImage(self.img_rgb, self.img_rgb.shape[1], self.img_rgb.shape[0], self.img_rgb.strides[0], QImage.Format_RGB888)
         self.pic.setPixmap(QPixmap.fromImage(image))
         layout.addWidget(self.pic)
 
