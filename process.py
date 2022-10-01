@@ -210,37 +210,11 @@ class Ui_MainWindow(QWidget):
         self.contrast_value_now = value
         self.update()
     
-    def changeBrightness(self,img,value):
-        hsv = cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
-        h,s,v = cv2.split(hsv)
-        lim = 255 - value
-        v[v>lim] = 255
-        v[v<=lim] += value
-        final_hsv = cv2.merge((h,s,v))
-        img = cv2.cvtColor(final_hsv,cv2.COLOR_HSV2BGR)
-        return img
-        
-    def changeBlur(self,img,value):
-        kernel_size = (value+1,value+1) 
-        img = cv2.blur(img,kernel_size)
-        return img
-
-    def changeContrast(self,img,value):
-
-        lab= cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
-        l_channel, a, b = cv2.split(lab)
-        clahe = cv2.createCLAHE(clipLimit=((value/100)+1))
-        cl = clahe.apply(l_channel)
-        limg = cv2.merge((cl,a,b))
-        img = cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
-       
-        return img
-    
     def update(self):
 
-        img = self.changeBrightness(self.image,self.brightness_value_now)
-        img = self.changeBlur(img,self.blur_value_now)
-        img = self.changeContrast(img,self.contrast_value_now)
+        img = ip.changeBrightness(self.image, self.brightness_value_now)
+        img = ip.changeBlur(img,self.blur_value_now)
+        img = ip.changeContrast(img,self.contrast_value_now)
 
         img = ip.channel_correction(img.copy(
         ), (0, 1, 2), (self.r_val / 100, self.g_val / 100, self.b_val / 100))
