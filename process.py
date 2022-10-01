@@ -58,6 +58,20 @@ class Ui_MainWindow(QWidget):
         self.horizontalLayout = QtWidgets.QVBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
 
+        # dropdown for rgb channel selection
+        self.combo_box = QComboBox(self)
+        self.combo_box.setGeometry(100, 100, 100, 30)
+        self.combo_box.addItem("Red")
+        self.combo_box.addItem("Green")
+        self.combo_box.addItem("Blue")
+        self.horizontalLayout.addWidget(self.combo_box)
+
+        #  button for selecting rgb channel
+        self.rgbChannelButton = QtWidgets.QPushButton(self.centralwidget)
+        self.rgbChannelButton.setObjectName("rgbChannelButton")
+        self.rgbChannelButton.setText("Select Channel")
+        self.horizontalLayout.addWidget(self.rgbChannelButton)
+
         # brightness slider
         self.verticalSlider = QtWidgets.QSlider(self.centralwidget)
         self.verticalSlider.setOrientation(QtCore.Qt.Horizontal)
@@ -136,10 +150,21 @@ class Ui_MainWindow(QWidget):
         self.pushButton_2.setObjectName("pushButton_2")
         self.horizontalLayout_2.addWidget(self.pushButton_2)
 
+        if self.label:
         # save button
-        self.pushButton = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton.setObjectName("pushButton")
-        self.horizontalLayout_2.addWidget(self.pushButton)
+            self.pushButton = QtWidgets.QPushButton(self.centralwidget)
+            self.pushButton.setObjectName("pushButton")
+            self.horizontalLayout_2.addWidget(self.pushButton)
+
+        #  button for selecting rgb channel
+        self.pushButton_3 = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_3.setObjectName("pushButton_3")
+        self.pushButton_3.setText("Select Channel")
+        self.horizontalLayout_2.addWidget(self.pushButton_3)
+        self.pushButton_3.clicked.connect(self.takeinputs)
+        
+        # modal called
+        self.retranslateUi(MainWindow)
 
         # image area
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
@@ -170,7 +195,37 @@ class Ui_MainWindow(QWidget):
         self.pushButton_2.clicked.connect(self.loadImage)
         self.pushButton.clicked.connect(self.savePhoto)
         
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)        
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)   
+
+    def retranslateUi2(self, MainWindow):
+        _translate = QtCore.QCoreApplication.translate
+        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        self.pushButton_3.setText(_translate("MainWindow", "Proceed"))
+        self.pushButton_3.clicked.connect(self.takeinputs)
+
+    def takeinputs(self):
+        name, done1 = QtWidgets.QInputDialog.getText(
+             self, 'Input Dialog', 'Red Channel:')
+ 
+        roll, done2 = QtWidgets.QInputDialog.getInt(
+           self, 'Input Dialog', 'Green Channel:') 
+ 
+        cgpa, done3 = QtWidgets.QInputDialog.getDouble(
+              self, 'Input Dialog', 'Blue Channel:')
+ 
+        langs =['C', 'c++', 'Java', 'Python', 'Javascript']
+        lang, done4 = QtWidgets.QInputDialog.getItem(
+          self, 'Input Dialog', 'Language you know:', langs)
+ 
+        if done1 and done2 and done3 and done4 :
+             # Showing confirmation message along
+             # with information provided by user.
+             self.label.setText('Information stored Successfully\nName: '
+                                 +str(name)+'('+str(roll)+')'+'\n'+'CGPA: '
+                                 +str(cgpa)+'\nSelected Language: '+str(lang))  
+  
+             # Hide the pushbutton after inputs provided by the use.
+             self.pushButton.hide()          
        
     def updateValue(self):
         self.brightness_value_now2 = self.verticalSlider.value()
@@ -204,9 +259,6 @@ class Ui_MainWindow(QWidget):
         self.update()
     
     def contrast_value(self,value):
-        """ This function will take value from the slider
-            for the contrast from 0 to 99
-        """
         self.contrast_value_now = value
         self.update()
     
@@ -259,6 +311,8 @@ class Ui_MainWindow(QWidget):
         MainWindow.setWindowTitle(_translate("MainWindow", "JUNO Photo Editor"))
         self.pushButton_2.setText(_translate("MainWindow", "Open"))
         self.pushButton.setText(_translate("MainWindow", "Save"))
+        self.pushButton_3.setText(_translate("MainWindow", "Choose"))
+        
     
     def valuechange(self):
         self.r_val = self.sl4.value()
