@@ -1,11 +1,12 @@
 import os
 import sys
+import numpy as np
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import cv2
 
-INIT_VAL = 50
+INIT_VAL = 100
 MAX_VAL = 100
 MIN_VAL = 0
 
@@ -21,36 +22,23 @@ class JUNOEditor(QWidget):
         super(JUNOEditor, self).__init__(parent)
 
         self.r_val, self.g_val, self.b_val = INIT_VAL, INIT_VAL, INIT_VAL
-        self.imageBlue = cv2.imread(BLUE_IMG)
-        self.imageBlue = cv2.cvtColor(self.imageBlue, cv2.COLOR_BGR2RGB)
-        self.imageGreen = cv2.imread(GREEN_IMG)
-        self.imageGreen = cv2.cvtColor(self.imageGreen, cv2.COLOR_BGR2RGB)
-        self.imageRed = cv2.imread(RED_IMG)
-        self.imageRed = cv2.cvtColor(self.imageRed, cv2.COLOR_BGR2RGB)
+        self.imageBlue = cv2.imread(BLUE_IMG, 0)
+        self.imageGreen = cv2.imread(GREEN_IMG, 0)
+        self.imageRed = cv2.imread(RED_IMG, 0)
 
         self.init_layout()
 
     def get_image(self):
 
         b = self.imageBlue.copy()
-        # set green and red channels to 0
-        b[:, :, 1] = 0
-        b[:, :, 2] = 0
-        b[:, :, 0] = b[:, :, 0] * (self.b_val / 100)
-
         g = self.imageGreen.copy()
-        # set blue and red channels to 0
-        g[:, :, 0] = 0
-        g[:, :, 2] = 0
-        g[:, :, 1] = g[:, :, 1] * (self.g_val / 100)
-
         r = self.imageRed.copy()
-        # set blue and green channels to 0
-        r[:, :, 0] = 0
-        r[:, :, 1] = 0
-        r[:, :, 2] = r[:, :, 2] * (self.r_val / 100)
+        
+        rgb = np.zeros((b.shape[0], b.shape[1], 3), dtype=np.uint8)
+        rgb[:, :, 0] = r[:, :] * (self.r_val / 100)
+        rgb[:, :, 1] = g[:, :] * (self.g_val / 100)
+        rgb[:, :, 2] = b[:, :] * (self.b_val / 100)
 
-        rgb = r + g + b
         return rgb
         
 
@@ -114,7 +102,7 @@ class JUNOEditor(QWidget):
 
         self.setLayout(layout)
         self.move(100, 100)
-        self.setFixedSize(1500,1000)
+        self.setFixedSize(1000,1000)
         self.setWindowTitle("JUNO Editor")
 		
 def main():
