@@ -5,7 +5,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import cv2
 
-INIT_VAL = 100
+INIT_VAL = 50
 MAX_VAL = 100
 MIN_VAL = 0
 
@@ -113,6 +113,8 @@ class JUNOEditor(QWidget):
         layout.addWidget(self.pic)
 
         self.setLayout(layout)
+        self.move(100, 100)
+        self.setFixedSize(1500,1000)
         self.setWindowTitle("JUNO Editor")
 		
 def main():
