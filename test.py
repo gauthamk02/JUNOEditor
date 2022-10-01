@@ -1,10 +1,21 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtGui import QImage
 import cv2, imutils
+import numpy as np
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
+         # Added code here
+        self.filename = None # Will hold the image address location
+        self.tmp = None # Will hold the temporary image for display
+        self.brightness_value_now = 0 # Updated brightness value
+        self.blur_value_now = 0 # Updated blur value
+        self.contrast_value_now = 0 # Updated contrast value
+
         MainWindow.setObjectName("MainWindow")
         MainWindow.setFixedSize(800, 800)
 
@@ -13,21 +24,36 @@ class Ui_MainWindow(object):
 
         self.gridLayout_2 = QtWidgets.QGridLayout(self.centralwidget)
         self.gridLayout_2.setObjectName("gridLayout_2")
-        
+
         
         self.horizontalLayout = QtWidgets.QVBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
 
+        # brightness slider
         self.verticalSlider = QtWidgets.QSlider(self.centralwidget)
         self.verticalSlider.setOrientation(QtCore.Qt.Horizontal)
         self.verticalSlider.setObjectName("verticalSlider")
+        self.l1 = QLabel("Brightness: " + str(self.brightness_value_now))
+        self.l1.setAlignment(Qt.AlignCenter)
+        self.horizontalLayout.addWidget(self.l1)
         self.horizontalLayout.addWidget(self.verticalSlider)
+        self.verticalSlider.valueChanged['int'].connect(self.brightness_value)
 
+        # blur slider
         self.verticalSlider_2 = QtWidgets.QSlider(self.centralwidget)
         self.verticalSlider_2.setOrientation(QtCore.Qt.Horizontal)
         self.verticalSlider_2.setObjectName("verticalSlider_2")
         self.horizontalLayout.addWidget(self.verticalSlider_2)
+        self.verticalSlider_2.valueChanged['int'].connect(self.blur_value)
 
+        # contrast slider
+        self.verticalSlider_3 = QtWidgets.QSlider(self.centralwidget)
+        self.verticalSlider_3.setOrientation(QtCore.Qt.Horizontal)
+        self.verticalSlider_3.setObjectName("verticalSlider_3")
+        self.horizontalLayout.addWidget(self.verticalSlider_3)
+        self.verticalSlider_3.valueChanged['int'].connect(self.contrast_value)
+
+        # --- buttons -------
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         self.horizontalLayout_3.addLayout(self.horizontalLayout)
@@ -45,14 +71,14 @@ class Ui_MainWindow(object):
         self.pushButton.setObjectName("pushButton")
         self.horizontalLayout_2.addWidget(self.pushButton)
 
-        
+
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setText("")
         self.label.setObjectName("label")
         self.horizontalLayout_3.addWidget(self.label)
         self.gridLayout = QtWidgets.QGridLayout()
-        self.gridLayout.addLayout(self.horizontalLayout_3, 0, 0, 1, 2)
-        self.gridLayout.addLayout(self.horizontalLayout_2, 1, 0, 1, 1)
+        self.gridLayout.addLayout(self.horizontalLayout_3, 0, 0, 1, 0)
+        self.gridLayout.addLayout(self.horizontalLayout_2, 1, 0, 4, 1)
         
         self.gridLayout.setObjectName("gridLayout")
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
@@ -64,18 +90,14 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.verticalSlider.valueChanged['int'].connect(self.brightness_value)
-        self.verticalSlider_2.valueChanged['int'].connect(self.blur_value)
+       
+
         self.pushButton_2.clicked.connect(self.loadImage)
         self.pushButton.clicked.connect(self.savePhoto)
         
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         
-        # Added code here
-        self.filename = None # Will hold the image address location
-        self.tmp = None # Will hold the temporary image for display
-        self.brightness_value_now = 0 # Updated brightness value
-        self.blur_value_now = 0 # Updated blur value
+       
     
     def loadImage(self):
         """ This function will load the user selected image
@@ -107,6 +129,15 @@ class Ui_MainWindow(object):
         self.blur_value_now = value
         print('Blur: ',value)
         self.update()
+
+    
+    def contrast_value(self,value):
+        """ This function will take value from the slider
+            for the contrast from 0 to 99
+        """
+        self.contrast_value_now = value
+        print('Contrast: ',value)
+        self.update()
     
     
     def changeBrightness(self,img,value):
@@ -131,6 +162,28 @@ class Ui_MainWindow(object):
         kernel_size = (value+1,value+1) # +1 is to avoid 0
         img = cv2.blur(img,kernel_size)
         return img
+
+    def changeContrast(self,img,value):
+        """ This function will take an image (img) and the contrast
+            value. It will perform the contrast change using OpenCv
+            and after split, will merge the img and return it.
+        """
+        lab= cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+        l_channel, a, b = cv2.split(lab)
+        # feel free to try different values for the limit and grid size:
+        clahe = cv2.createCLAHE(clipLimit=((value/100)+1))
+        cl = clahe.apply(l_channel)
+        limg = cv2.merge((cl,a,b))
+        img = cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
+
+        # img = np.hstack((img, enhanced_img))
+        # hsv = cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
+        # h,s,v = cv2.split(hsv)
+        # v[v>127] = 255
+        # v[v<=127] += value
+        # final_hsv = cv2.merge((h,s,v))
+        # img = cv2.cvtColor(final_hsv,cv2.COLOR_HSV2BGR)
+        return img
     
     def update(self):
         """ This function will update the photo according to the 
@@ -138,6 +191,7 @@ class Ui_MainWindow(object):
         """
         img = self.changeBrightness(self.image,self.brightness_value_now)
         img = self.changeBlur(img,self.blur_value_now)
+        img = self.changeContrast(img,self.contrast_value_now)
         self.setPhoto(img)
     
     def savePhoto(self):
