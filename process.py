@@ -13,44 +13,37 @@ INIT_VAL = 100
 MAX_VAL = 100
 MIN_VAL = 0
 
-# GREEN_IMG = 'ImageSet/JNCE_2022272_45C00002_V01-green.png'
-# BLUE_IMG = 'ImageSet/JNCE_2022272_45C00002_V01-blue.png'
-# RED_IMG = 'ImageSet/JNCE_2022272_45C00002_V01-red.png'
 
-class Ui_MainWindow(object):    
 
-    # def __init__(self, parent=None):
-    #     super(Ui_MainWindow, self).__init__(parent)
+class Ui_MainWindow(QWidget):    
 
-    #     self.r_val, self.g_val, self.b_val = INIT_VAL, INIT_VAL, INIT_VAL
-    #     self.imageBlue = cv2.imread(BLUE_IMG, 0)
-    #     self.imageGreen = cv2.imread(GREEN_IMG, 0)
-    #     self.imageRed = cv2.imread(RED_IMG, 0)
+    def __init__(self, parent=None):
 
-    #     self.img_rgb = np.zeros(
-    #         (self.imageBlue.shape[0], self.imageBlue.shape[1], 3), dtype=np.uint8)
-    #     self.img_rgb[:, :, 0] = self.imageRed[:, :]
-    #     self.img_rgb[:, :, 1] = self.imageGreen[:, :]
-    #     self.img_rgb[:, :, 2] = self.imageBlue[:, :]
+        super(Ui_MainWindow, self).__init__(parent)
 
-    #     self.setupUi()
+        self.image=cv2.imread("ImageSet/dummyBlack.jpg", 0)
+        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.label = QtWidgets.QLabel(self.centralwidget)
+        self.setupUi()
+        self.setPhoto(self.image)
+        # self.setupUi()
 
-    def setupUi(self, MainWindow):
+    def setupUi(self):
+        
          # Added code here  
         self.filename = None 
-        self.tmp = None # Will hold the temporary image for display
-        self.brightness_value_now = 0 # Updated brightness value
+        self.tmp = None 
+        self.brightness_value_now = 0 
         self.brightness_value_now2 = 0 
-        self.blur_value_now = 0 # Updated blur value
+        self.blur_value_now = 0 
         self.blur_value_now2 = 0
-        self.contrast_value_now = 0 # Updated contrast value
+        self.contrast_value_now = 0 
         self.contrast_value_now2 = 0
 
-            
+        self.image=cv2.imread("ImageSet/dummyBlack.jpg", 0)
         MainWindow.setObjectName("MainWindow")
         MainWindow.setFixedSize(1000, 800)
 
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
 
         self.gridLayout_2 = QtWidgets.QGridLayout(self.centralwidget)
@@ -149,8 +142,8 @@ class Ui_MainWindow(object):
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         self.horizontalLayout_3.addLayout(self.horizontalLayout)
         self.horizontalLayout_3.setContentsMargins(0,0,0,0)
-        self.label = QtWidgets.QLabel(self.centralwidget)
-        self.label.setText("")
+        # self.label = QtWidgets.QLabel(self.centralwidget)
+        self.label.setText("Upload Image")
         self.label.setObjectName("label")
         self.horizontalLayout_3.addWidget(self.label)
 
@@ -187,9 +180,6 @@ class Ui_MainWindow(object):
         self.l3.setText("Contrast: " + str(self.contrast_value_now2))
 
     def loadImage(self):
-        """ This function will load the user selected image
-            and set it to label using the setPhoto function
-        """
         self.filename = QFileDialog.getOpenFileName(filter="Image (*.*)")[0]
         self.image = cv2.imread(self.filename)
         self.setPhoto(self.image)
@@ -202,17 +192,14 @@ class Ui_MainWindow(object):
         self.label.setPixmap(QtGui.QPixmap.fromImage(image))
     
     def brightness_value(self,value):
-        """ This function will take value from the slider
-            for the brightness from 0 to 99
-        """
+
         self.brightness_value_now = value
         print('Brightness: ',value)
         self.update()
 
         
     def blur_value(self,value):
-        """ This function will take value from the slider 
-            for the blur from 0 to 99 """
+
         self.blur_value_now = value
         print('Blur: ',value)
         self.update()
@@ -228,10 +215,6 @@ class Ui_MainWindow(object):
     
     
     def changeBrightness(self,img,value):
-        """ This function will take an image (img) and the brightness
-            value. It will perform the brightness change using OpenCv
-            and after split, will merge the img and return it.
-        """
         hsv = cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
         h,s,v = cv2.split(hsv)
         lim = 255 - value
@@ -242,47 +225,34 @@ class Ui_MainWindow(object):
         return img
         
     def changeBlur(self,img,value):
-        """ This function will take the img image and blur values as inputs.
-            After perform blur operation using opencv function, it returns 
-            the image img.
-        """
-        kernel_size = (value+1,value+1) # +1 is to avoid 0
+        kernel_size = (value+1,value+1) 
         img = cv2.blur(img,kernel_size)
         return img
 
     def changeContrast(self,img,value):
-        """ This function will take an image (img) and the contrast
-            value. It will perform the contrast change using OpenCv
-            and after split, will merge the img and return it.
-        """
+
         lab= cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
         l_channel, a, b = cv2.split(lab)
-        # feel free to try different values for the limit and grid size:
         clahe = cv2.createCLAHE(clipLimit=((value/100)+1))
         cl = clahe.apply(l_channel)
         limg = cv2.merge((cl,a,b))
         img = cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
 
-        # img = np.hstack((img, enhanced_img))
-        # hsv = cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
-        # h,s,v = cv2.split(hsv)
-        # v[v>127] = 255
-        # v[v<=127] += value
-        # final_hsv = cv2.merge((h,s,v))
-        # img = cv2.cvtColor(final_hsv,cv2.COLOR_HSV2BGR)
+       
         return img
     
     def update(self):
-        """ This function will update the photo according to the 
-            current values of blur and brightness and set it to photo label.
-        """
+
         img = self.changeBrightness(self.image,self.brightness_value_now)
         img = self.changeBlur(img,self.blur_value_now)
         img = self.changeContrast(img,self.contrast_value_now)
+
+        img = ip.channel_correction(img.copy(
+        ), (0, 1, 2), (self.r_val / 100, self.g_val / 100, self.b_val / 100))
+
         self.setPhoto(img)
     
     def savePhoto(self):
-        """ This function will save the image"""
         
         filename = QFileDialog.getSaveFileName(filter="JPG(*.jpg);;PNG(*.png);;TIFF(*.tiff);;BMP(*.bmp)")[0]
         
@@ -296,13 +266,6 @@ class Ui_MainWindow(object):
         self.pushButton_2.setText(_translate("MainWindow", "Open"))
         self.pushButton.setText(_translate("MainWindow", "Save"))
 
-    # RGB Channel Correction
-    def updateImage(self):
-        img = ip.channel_correction(self.image.copy(
-        ), (0, 1, 2), (self.r_val / 100, self.g_val / 100, self.b_val / 100))
-        # img = QImage(img, QImage.Format_RGB888)
-        # self.pic.setPixmap(QPixmap.fromImage(image))
-        self.setPhoto(img)
 
     
     def valuechange(self):
@@ -312,7 +275,8 @@ class Ui_MainWindow(object):
         self.l4.setText("Red: " + str(self.r_val))
         self.l5.setText("Green: " + str(self.g_val))
         self.l6.setText("Blue: " + str(self.b_val))
-        self.updateImage()
+        # self.updateImage()
+        self.update()
 
 
 if __name__ == "__main__":
@@ -357,6 +321,6 @@ if __name__ == "__main__":
     app.setStyleSheet(style)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
+    # ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
