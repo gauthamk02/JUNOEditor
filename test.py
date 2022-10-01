@@ -13,13 +13,7 @@ class Ui_MainWindow(object):
 
         self.gridLayout_2 = QtWidgets.QGridLayout(self.centralwidget)
         self.gridLayout_2.setObjectName("gridLayout_2")
-
-        self.gridLayout = QtWidgets.QGridLayout()
-        self.gridLayout.setObjectName("gridLayout")
-        self.label = QtWidgets.QLabel(self.centralwidget)
-        self.label.setText("")
-        self.label.setObjectName("label")
-
+        
         
         self.horizontalLayout = QtWidgets.QVBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
@@ -34,11 +28,10 @@ class Ui_MainWindow(object):
         self.verticalSlider_2.setObjectName("verticalSlider_2")
         self.horizontalLayout.addWidget(self.verticalSlider_2)
 
-        self.horizontalLayout_3 = QtWidgets.QVBoxLayout()
+        self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
-        self.horizontalLayout_3.addWidget(self.label)
         self.horizontalLayout_3.addLayout(self.horizontalLayout)
-        self.gridLayout.addLayout(self.horizontalLayout_3, 0, 0, 1, 2)
+        self.horizontalLayout_3.setContentsMargins(0,0,0,0)
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
 
@@ -52,7 +45,16 @@ class Ui_MainWindow(object):
         self.pushButton.setObjectName("pushButton")
         self.horizontalLayout_2.addWidget(self.pushButton)
 
+        
+        self.label = QtWidgets.QLabel(self.centralwidget)
+        self.label.setText("")
+        self.label.setObjectName("label")
+        self.horizontalLayout_3.addWidget(self.label)
+        self.gridLayout = QtWidgets.QGridLayout()
+        self.gridLayout.addLayout(self.horizontalLayout_3, 0, 0, 1, 2)
         self.gridLayout.addLayout(self.horizontalLayout_2, 1, 0, 1, 1)
+        
+        self.gridLayout.setObjectName("gridLayout")
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.gridLayout.addItem(spacerItem, 1, 1, 1, 1)
         self.gridLayout_2.addLayout(self.gridLayout, 0, 0, 1, 1)
@@ -84,10 +86,6 @@ class Ui_MainWindow(object):
         self.setPhoto(self.image)
     
     def setPhoto(self,image):
-        """ This function will take image input and resize it 
-            only for display purpose and convert it to QImage
-            to set at the label.
-        """
         self.tmp = image
         image = imutils.resize(image,width=640)
         frame = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -178,6 +176,7 @@ if __name__ == "__main__":
             background: #0577a8;
             border: 1px #DADADA solid;
             padding: 5px 10px;
+            margin: 5px;
             border-radius: 2px;
             font-weight: bold;
             font-size: 9pt;
