@@ -7,13 +7,14 @@ from PyQt5.QtGui import QImage
 import cv2, imutils
 from ImageProcessing import Processing as ip
 import numpy as np
-
+import os
 
 INIT_VAL = 100
 MAX_VAL = 100
 MIN_VAL = 0
 
-
+os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = QLibraryInfo.location(
+    QLibraryInfo.PluginsPath)
 
 class Ui_MainWindow(QWidget):    
 
@@ -21,12 +22,17 @@ class Ui_MainWindow(QWidget):
 
         super(Ui_MainWindow, self).__init__(parent)
 
-        self.image=cv2.imread("ImageSet/dummyBlack.jpg", 0)
+        self.image=cv2.imread("ImageSet/dummyBlack.jpg")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.setupUi()
         self.setPhoto(self.image)
-        # self.setupUi()
+        self.initState()
+
+    def initState(self):
+        self.r_val = INIT_VAL
+        self.g_val = INIT_VAL
+        self.b_val = INIT_VAL
 
     def setupUi(self):
         
@@ -49,7 +55,6 @@ class Ui_MainWindow(QWidget):
         self.gridLayout_2 = QtWidgets.QGridLayout(self.centralwidget)
         self.gridLayout_2.setObjectName("gridLayout_2")
 
-        
         self.horizontalLayout = QtWidgets.QVBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
 
@@ -65,7 +70,6 @@ class Ui_MainWindow(QWidget):
         self.horizontalLayout.addWidget(self.verticalSlider)
         self.verticalSlider.valueChanged['int'].connect(self.brightness_value)
         
-
         # blur slider
         self.verticalSlider_2 = QtWidgets.QSlider(self.centralwidget)
         self.verticalSlider_2.setOrientation(QtCore.Qt.Horizontal)
@@ -163,12 +167,10 @@ class Ui_MainWindow(QWidget):
 
         self.retranslateUi(MainWindow)
        
-
         self.pushButton_2.clicked.connect(self.loadImage)
         self.pushButton.clicked.connect(self.savePhoto)
         
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
-        
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)        
        
     def updateValue(self):
         self.brightness_value_now2 = self.verticalSlider.value()
@@ -194,25 +196,19 @@ class Ui_MainWindow(QWidget):
     def brightness_value(self,value):
 
         self.brightness_value_now = value
-        print('Brightness: ',value)
         self.update()
-
         
     def blur_value(self,value):
 
         self.blur_value_now = value
-        print('Blur: ',value)
         self.update()
-
     
     def contrast_value(self,value):
         """ This function will take value from the slider
             for the contrast from 0 to 99
         """
         self.contrast_value_now = value
-        print('Contrast: ',value)
         self.update()
-    
     
     def changeBrightness(self,img,value):
         hsv = cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
@@ -237,7 +233,6 @@ class Ui_MainWindow(QWidget):
         cl = clahe.apply(l_channel)
         limg = cv2.merge((cl,a,b))
         img = cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
-
        
         return img
     
@@ -259,14 +254,11 @@ class Ui_MainWindow(QWidget):
         cv2.imwrite(filename,self.tmp)
         print('Image saved as:',self.filename)
     
-    
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "JUNO Photo Editor"))
         self.pushButton_2.setText(_translate("MainWindow", "Open"))
         self.pushButton.setText(_translate("MainWindow", "Save"))
-
-
     
     def valuechange(self):
         self.r_val = self.sl4.value()
@@ -277,7 +269,6 @@ class Ui_MainWindow(QWidget):
         self.l6.setText("Blue: " + str(self.b_val))
         # self.updateImage()
         self.update()
-
 
 if __name__ == "__main__":
     import sys
