@@ -15,22 +15,19 @@ GREEN_IMG = 'ImageSet/JNCE_2022272_45C00002_V01-green.png'
 BLUE_IMG = 'ImageSet/JNCE_2022272_45C00002_V01-blue.png'
 RED_IMG = 'ImageSet/JNCE_2022272_45C00002_V01-red.png'
 
-os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = QLibraryInfo.location(
-    QLibraryInfo.PluginsPath)
-
+os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = QLibraryInfo.location(QLibraryInfo.PluginsPath)
 
 class JUNOEditor(QWidget):
-
-    def __init__(self, parent=None):
+    
+    def __init__(self, parent = None):
         super(JUNOEditor, self).__init__(parent)
 
         self.r_val, self.g_val, self.b_val = INIT_VAL, INIT_VAL, INIT_VAL
         self.imageBlue = cv2.imread(BLUE_IMG, 0)
         self.imageGreen = cv2.imread(GREEN_IMG, 0)
         self.imageRed = cv2.imread(RED_IMG, 0)
-
-        self.img_rgb = np.zeros(
-            (self.imageBlue.shape[0], self.imageBlue.shape[1], 3), dtype=np.uint8)
+        
+        self.img_rgb = np.zeros((self.imageBlue.shape[0], self.imageBlue.shape[1], 3), dtype=np.uint8)
         self.img_rgb[:, :, 0] = self.imageRed[:, :]
         self.img_rgb[:, :, 1] = self.imageGreen[:, :]
         self.img_rgb[:, :, 2] = self.imageBlue[:, :]
@@ -38,10 +35,8 @@ class JUNOEditor(QWidget):
         self.init_layout()
 
     def updateImage(self):
-        img = ip.channel_correction(self.img_rgb.copy(
-        ), (0, 1, 2), (self.r_val / 100, self.g_val / 100, self.b_val / 100))
-        image = QImage(img, img.shape[1], img.shape[0],
-                       img.strides[0], QImage.Format_RGB888)
+        img = ip.channel_correction(self.img_rgb.copy(), (0, 1, 2), (self.r_val / 100, self.g_val / 100, self.b_val / 100))
+        image = QImage(img, img.shape[1], img.shape[0], img.strides[0], QImage.Format_RGB888)
         self.pic.setPixmap(QPixmap.fromImage(image))
 
     def valuechange(self):
@@ -59,7 +54,7 @@ class JUNOEditor(QWidget):
         self.l1 = QLabel("Red: " + str(INIT_VAL))
         self.l1.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.l1)
-
+		
         self.sl1 = QSlider(Qt.Horizontal)
         self.sl1.setMinimum(MIN_VAL)
         self.sl1.setMaximum(MAX_VAL)
@@ -77,7 +72,7 @@ class JUNOEditor(QWidget):
         self.sl2.setValue(INIT_VAL)
         self.sl2.valueChanged.connect(self.valuechange)
         layout.addWidget(self.sl2)
-
+        
         self.l3 = QLabel("Blue: " + str(INIT_VAL))
         self.l3.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.l3)
@@ -91,25 +86,20 @@ class JUNOEditor(QWidget):
 
         self.pic = QLabel()
         self.pic.setAlignment(Qt.AlignCenter)
-        image = QImage(
-            self.img_rgb, self.img_rgb.shape[1], self.img_rgb.shape[0], self.img_rgb.strides[0], QImage.Format_RGB888)
+        image = QImage(self.img_rgb, self.img_rgb.shape[1], self.img_rgb.shape[0], self.img_rgb.strides[0], QImage.Format_RGB888)
         self.pic.setPixmap(QPixmap.fromImage(image))
         layout.addWidget(self.pic)
 
         self.setLayout(layout)
         self.move(100, 100)
-        self.setFixedSize(1000, 1000)
+        self.setFixedSize(1000,1000)
         self.setWindowTitle("JUNO Editor")
-
-
+		
 def main():
-    app = QApplication(sys.argv)
-    style = """
-   """
-    screen = JUNOEditor()
-    screen.show()
-    sys.exit(app.exec_())
-
-
+   app = QApplication(sys.argv)
+   screen = JUNOEditor()
+   screen.show()
+   sys.exit(app.exec_())
+	
 if __name__ == '__main__':
-    main()
+   main()
