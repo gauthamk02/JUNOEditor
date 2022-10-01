@@ -6,7 +6,7 @@ import cv2, imutils
 class Ui_MainWindow(object):
 	def setupUi(self, MainWindow):
 		MainWindow.setObjectName("MainWindow")
-		MainWindow.resize(536, 571)
+		MainWindow.setFixedSize(536, 571)
 
 		self.centralwidget = QtWidgets.QWidget(MainWindow)
 		self.centralwidget.setObjectName("centralwidget")
@@ -24,11 +24,11 @@ class Ui_MainWindow(object):
 		self.horizontalLayout = QtWidgets.QHBoxLayout()
 		self.horizontalLayout.setObjectName("horizontalLayout")
 		self.verticalSlider = QtWidgets.QSlider(self.centralwidget)
-		self.verticalSlider.setOrientation(QtCore.Qt.Vertical)
+		self.verticalSlider.setOrientation(QtCore.Qt.Horizontal)
 		self.verticalSlider.setObjectName("verticalSlider")
 		self.horizontalLayout.addWidget(self.verticalSlider)
 		self.verticalSlider_2 = QtWidgets.QSlider(self.centralwidget)
-		self.verticalSlider_2.setOrientation(QtCore.Qt.Vertical)
+		self.verticalSlider_2.setOrientation(QtCore.Qt.Horizontal)
 		self.verticalSlider_2.setObjectName("verticalSlider_2")
 		self.horizontalLayout.addWidget(self.verticalSlider_2)
 		self.horizontalLayout_3.addLayout(self.horizontalLayout)
