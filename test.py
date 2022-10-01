@@ -259,12 +259,7 @@ if __name__ == "__main__":
             color: white;
             background: #0577a8;
             border: 1px #DADADA solid;
-            padding: 5px 10px;
-            margin: 5px;
-            border-radius: 2px;
-            font-weight: bold;
-            font-size: 9pt;
-            outline: none;
+            padding: 10px 15px;
         }
         QPushButton:hover{
             border: 1px #C6C6C6 solid;
