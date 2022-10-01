@@ -10,7 +10,7 @@ import numpy as np
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
          # Added code here
-        self.filename = None # Will hold the image address location
+        self.filename = None 
         self.tmp = None # Will hold the temporary image for display
         self.brightness_value_now = 0 # Updated brightness value
         self.brightness_value_now2 = 0 
@@ -21,7 +21,7 @@ class Ui_MainWindow(object):
 
             
         MainWindow.setObjectName("MainWindow")
-        MainWindow.setFixedSize(800, 800)
+        MainWindow.setFixedSize(1000, 800)
 
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -69,10 +69,7 @@ class Ui_MainWindow(object):
         self.verticalSlider_3.valueChanged['int'].connect(self.contrast_value)
 
         # --- buttons -------
-        self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
-        self.horizontalLayout_3.addLayout(self.horizontalLayout)
-        self.horizontalLayout_3.setContentsMargins(0,0,0,0)
+
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
 
@@ -86,14 +83,20 @@ class Ui_MainWindow(object):
         self.pushButton.setObjectName("pushButton")
         self.horizontalLayout_2.addWidget(self.pushButton)
 
-
+        # image area
+        self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
+        self.horizontalLayout_3.addLayout(self.horizontalLayout)
+        self.horizontalLayout_3.setContentsMargins(0,0,0,0)
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setText("")
         self.label.setObjectName("label")
         self.horizontalLayout_3.addWidget(self.label)
+
         self.gridLayout = QtWidgets.QGridLayout()
-        self.gridLayout.addLayout(self.horizontalLayout_3, 0, 0, 1, 0)
         self.gridLayout.addLayout(self.horizontalLayout_2, 1, 0, 4, 1)
+        self.gridLayout.addLayout(self.horizontalLayout_3, 0, 0, 1, 0)
+        
         
         self.gridLayout.setObjectName("gridLayout")
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
@@ -118,9 +121,9 @@ class Ui_MainWindow(object):
         self.blur_value_now2 = self.verticalSlider_2.value()
         self.contrast_value_now2 = self.verticalSlider_3.value()
 
-        self.l1.setText("brghtness: " + str(self.brightness_value_now2))
-        self.l2.setText("blur: " + str(self.blur_value_now2))
-        self.l3.setText("contrast: " + str(self.contrast_value_now2))
+        self.l1.setText("Brightness: " + str(self.brightness_value_now2))
+        self.l2.setText("Blur: " + str(self.blur_value_now2))
+        self.l3.setText("Contrast: " + str(self.contrast_value_now2))
 
     def loadImage(self):
         """ This function will load the user selected image
