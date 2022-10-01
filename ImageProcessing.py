@@ -1,6 +1,7 @@
 from skimage import img_as_ubyte
 # from skimage.color import rgb2gray
 from skimage.exposure import histogram, cumulative_distribution
+from PIL import Image, ImageEnhance
 import numpy as np
 import cv2
 
@@ -22,19 +23,24 @@ class Processing:
         img = image.copy()
         for channel in range(3):
             img[:,:,channel] = Processing.__linear_distribution(img, channel)
-        img = Processing.changeBrightness(img, 50)
-        img = Processing.changeContrast(img, 50)
-
-        return img
+        img = ImageEnhance.Brightness(Image.fromarray(img)).enhance(0.5)
+        img = ImageEnhance.Contrast(img).enhance(2)
+        img = ImageEnhance.Sharpness(img).enhance(10)
+        return np.array(img)
 
     def changeBrightness(img,value):
-        hsv = cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
-        h,s,v = cv2.split(hsv)
-        lim = 255 - value
-        v[v>lim] = 255
-        v[v<=lim] += value
-        final_hsv = cv2.merge((h,s,v))
-        img = cv2.cvtColor(final_hsv,cv2.COLOR_HSV2BGR)
+        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        h, s, v = cv2.split(hsv)
+        if value >= 0:
+            lim = 255 - value
+            v[v > lim] = 255
+            v[v <= lim] += value
+        else:
+            lim = abs(value)
+            v[v < lim] = 0
+            v[v >= lim] -= abs(value)
+        final_hsv = cv2.merge((h, s, v))
+        img = cv2.cvtColor(final_hsv, cv2.COLOR_HSV2BGR)
         return img
         
     def changeBlur(img,value):
