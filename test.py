@@ -13,9 +13,13 @@ class Ui_MainWindow(object):
         self.filename = None # Will hold the image address location
         self.tmp = None # Will hold the temporary image for display
         self.brightness_value_now = 0 # Updated brightness value
+        self.brightness_value_now2 = 0 
         self.blur_value_now = 0 # Updated blur value
+        self.blur_value_now2 = 0
         self.contrast_value_now = 0 # Updated contrast value
+        self.contrast_value_now2 = 0
 
+            
         MainWindow.setObjectName("MainWindow")
         MainWindow.setFixedSize(800, 800)
 
@@ -33,16 +37,23 @@ class Ui_MainWindow(object):
         self.verticalSlider = QtWidgets.QSlider(self.centralwidget)
         self.verticalSlider.setOrientation(QtCore.Qt.Horizontal)
         self.verticalSlider.setObjectName("verticalSlider")
-        self.l1 = QLabel("Brightness: " + str(self.brightness_value_now))
+        self.verticalSlider.setValue(self.brightness_value_now2)
+        self.l1 = QLabel("Brightness: " + str(self.brightness_value_now2))
         self.l1.setAlignment(Qt.AlignCenter)
         self.horizontalLayout.addWidget(self.l1)
+        self.verticalSlider.valueChanged.connect(self.updateValue)
         self.horizontalLayout.addWidget(self.verticalSlider)
         self.verticalSlider.valueChanged['int'].connect(self.brightness_value)
+        
 
         # blur slider
         self.verticalSlider_2 = QtWidgets.QSlider(self.centralwidget)
         self.verticalSlider_2.setOrientation(QtCore.Qt.Horizontal)
         self.verticalSlider_2.setObjectName("verticalSlider_2")
+        self.l2 = QLabel("Blur: " + str(self.blur_value_now2))
+        self.l2.setAlignment(Qt.AlignCenter)
+        self.horizontalLayout.addWidget(self.l2)
+        self.verticalSlider_2.valueChanged.connect(self.updateValue)
         self.horizontalLayout.addWidget(self.verticalSlider_2)
         self.verticalSlider_2.valueChanged['int'].connect(self.blur_value)
 
@@ -50,6 +61,10 @@ class Ui_MainWindow(object):
         self.verticalSlider_3 = QtWidgets.QSlider(self.centralwidget)
         self.verticalSlider_3.setOrientation(QtCore.Qt.Horizontal)
         self.verticalSlider_3.setObjectName("verticalSlider_3")
+        self.l3 = QLabel("Contrast: " + str(self.contrast_value_now2))
+        self.l3.setAlignment(Qt.AlignCenter)
+        self.horizontalLayout.addWidget(self.l3)
+        self.verticalSlider_3.valueChanged.connect(self.updateValue)
         self.horizontalLayout.addWidget(self.verticalSlider_3)
         self.verticalSlider_3.valueChanged['int'].connect(self.contrast_value)
 
@@ -98,7 +113,15 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         
        
-    
+    def updateValue(self):
+        self.brightness_value_now2 = self.verticalSlider.value()
+        self.blur_value_now2 = self.verticalSlider_2.value()
+        self.contrast_value_now2 = self.verticalSlider_3.value()
+
+        self.l1.setText("brghtness: " + str(self.brightness_value_now2))
+        self.l2.setText("blur: " + str(self.blur_value_now2))
+        self.l3.setText("contrast: " + str(self.contrast_value_now2))
+
     def loadImage(self):
         """ This function will load the user selected image
             and set it to label using the setPhoto function
@@ -218,6 +241,10 @@ if __name__ == "__main__":
         }
         QLabel{
             color: #fff;
+        }
+        QSlider{
+            height: 8px;
+            margin: 15px 0;
         }
         QLabel#round_count_label, QLabel#highscore_count_label{
             border: 1px solid #fff;
