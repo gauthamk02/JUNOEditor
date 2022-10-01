@@ -21,6 +21,7 @@ os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = QLibraryInfo.location(
 
 class JUNOEditor(QWidget):
 
+    # done
     def __init__(self, parent=None):
         super(JUNOEditor, self).__init__(parent)
 
@@ -37,6 +38,7 @@ class JUNOEditor(QWidget):
 
         self.init_layout()
 
+    # done
     def updateImage(self):
         img = ip.channel_correction(self.img_rgb.copy(
         ), (0, 1, 2), (self.r_val / 100, self.g_val / 100, self.b_val / 100))
@@ -44,6 +46,7 @@ class JUNOEditor(QWidget):
                        img.strides[0], QImage.Format_RGB888)
         self.pic.setPixmap(QPixmap.fromImage(image))
 
+    # done
     def valuechange(self):
         self.r_val = self.sl1.value()
         self.g_val = self.sl2.value()
@@ -53,6 +56,7 @@ class JUNOEditor(QWidget):
         self.l3.setText("Blue: " + str(self.b_val))
         self.updateImage()
 
+    # done
     def init_layout(self):
         layout = QVBoxLayout()
 
