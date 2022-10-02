@@ -22,7 +22,7 @@ class Ui_MainWindow(QWidget):
 
         super(Ui_MainWindow, self).__init__(parent)
 
-        self.image=cv2.imread("ImageSet/dummyBlack.jpg")
+        self.image = np.array(cv2.imread("ImageSet/dummyBlack.jpg"))
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.setupUi()
@@ -66,6 +66,8 @@ class Ui_MainWindow(QWidget):
         self.verticalSlider.setOrientation(QtCore.Qt.Horizontal)
         self.verticalSlider.setObjectName("verticalSlider")
         self.verticalSlider.setValue(self.brightness_value_now2)
+        self.verticalSlider.setMinimum(-100)
+        self.verticalSlider.setMaximum(100)
         self.l1 = QLabel("Brightness: " + str(self.brightness_value_now2))
         self.l1.setAlignment(Qt.AlignCenter)
         self.verticalLayout.addWidget(self.l1)
@@ -154,6 +156,12 @@ class Ui_MainWindow(QWidget):
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
 
+        # auto-enhance button
+        self.autoEnhanceButton = QtWidgets.QPushButton(self.centralwidget)
+        self.autoEnhanceButton.setObjectName("autoEnhanceButton")
+        self.autoEnhanceButton.setText("Auto Enhance")
+        self.horizontalLayout_2.addWidget(self.autoEnhanceButton)
+
         # open button
         self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_2.setObjectName("pushButton_2")
@@ -197,6 +205,7 @@ class Ui_MainWindow(QWidget):
        
         self.pushButton_2.clicked.connect(self.loadImage)
         self.pushButton.clicked.connect(self.savePhoto)
+        self.autoEnhanceButton.clicked.connect(self.autoEnhance)
         
         QtCore.QMetaObject.connectSlotsByName(MainWindow)   
 
@@ -221,7 +230,13 @@ class Ui_MainWindow(QWidget):
         self.optionsLayout.addWidget(sl5)
         
         # self.pushButton.hide()          
-       
+               
+    
+    def autoEnhance(self):
+        img = ip.auto_enhance(self.image)
+        self.image = img
+        self.setPhoto(img)
+
     def updateValue(self):
         self.brightness_value_now2 = self.verticalSlider.value()
         self.blur_value_now2 = self.verticalSlider_2.value()
@@ -257,37 +272,12 @@ class Ui_MainWindow(QWidget):
         self.contrast_value_now = value
         self.update()
     
-    def changeBrightness(self,img,value):
-        hsv = cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
-        h,s,v = cv2.split(hsv)
-        lim = 255 - value
-        v[v>lim] = 255
-        v[v<=lim] += value
-        final_hsv = cv2.merge((h,s,v))
-        img = cv2.cvtColor(final_hsv,cv2.COLOR_HSV2BGR)
-        return img
-        
-    def changeBlur(self,img,value):
-        kernel_size = (value+1,value+1) 
-        img = cv2.blur(img,kernel_size)
-        return img
-
-    def changeContrast(self,img,value):
-
-        lab= cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
-        l_channel, a, b = cv2.split(lab)
-        clahe = cv2.createCLAHE(clipLimit=((value/100)+1))
-        cl = clahe.apply(l_channel)
-        limg = cv2.merge((cl,a,b))
-        img = cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
-       
-        return img
-    
     def update(self):
 
-        img = self.changeBrightness(self.image,self.brightness_value_now)
-        img = self.changeBlur(img,self.blur_value_now)
-        img = self.changeContrast(img,self.contrast_value_now)
+        brightness = np.interp(self.brightness_value_now, [-100, 100], [-255, 255]).astype(np.int64)
+        img = ip.changeBrightness(self.image, brightness)
+        img = ip.changeBlur(img,self.blur_value_now)
+        img = ip.changeContrast(img,self.contrast_value_now)
 
         img = ip.channel_correction(img.copy(
         ), (0, 1, 2), (self.r_val / 100, self.g_val / 100, self.b_val / 100))
