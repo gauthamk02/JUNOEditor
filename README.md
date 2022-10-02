@@ -18,3 +18,18 @@ The functionalities of the application are:
 3. Activate the virtual environment using `source venv/bin/activate`
 4. Install the requirements using `pip install -r requirements.txt`
 5. Run the application using `python main.py` or `python3 main.py`
+
+## Usage
+
+1. Open the application using `python main.py` or `python3 main.py`
+2. You have option to either Upload one RGB image or three different grey-scale images for each channel. Select the reuired option and upload the image(s).
+3. You can see the image in the application. You can change the contrast, brightness, sharpness and color balance of the image using the sliders or use the auto-enhancer to get better results and modify that.
+4. You can save the image using the save button.
+
+## Example
+
+![GUI](example/GUI_sample.png)
+
+![Sample Image 1 Original](example/sample1_original.jpeg)
+
+![Sample Image 1 Modified](example/sample1_modified.jpeg)
