@@ -50,6 +50,7 @@ class Ui_MainWindow(QWidget):
         self.brightness_value = INIT_BRIGHTNESS
         self.blur_value = INIT_BLUR
         self.contrast_value = INIT_CONTRAST
+        self.isEnhanced=False
 
     def setupUi(self):
         
@@ -194,7 +195,7 @@ class Ui_MainWindow(QWidget):
         self.pushButton_4 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_4.setObjectName("pushButton_4")
         self.horizontalLayout_2.addWidget(self.pushButton_4)
-        self.pushButton.clicked.connect(self.resetImage)
+        self.pushButton_4.clicked.connect(self.resetImage)
 
   
         # modal called
@@ -264,10 +265,22 @@ class Ui_MainWindow(QWidget):
             self.image = img
             self.setPhoto(img)
 
+    def resetSlider(self):
+        self.redSlider.setValue(INIT_RGBVAL)
+        self.greenSlider.setValue(INIT_RGBVAL)
+        self.blueSlider.setValue(INIT_RGBVAL)
+
+        self.contrastSlider.setValue(INIT_CONTRAST)
+        self.brightnessSlider.setValue(INIT_BRIGHTNESS)
+        # self.saturationSlider.setValue(INIT_SATURATION)
+        self.blueSlider.setValue(INIT_BLUR)
+
     def resetImage(self):
         self.image = self.tempImg
         self.setPhoto(self.image)
-        self.isEnhanced=False
+        
+        self.initState()
+        self.resetSlider()
 
     def updateValue(self):
         self.brightness_value = self.brightnessSlider.value()
