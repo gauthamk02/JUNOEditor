@@ -42,6 +42,7 @@ class Ui_MainWindow(QWidget):
          # Added code here  
         self.filename = None 
         self.tmp = None 
+        self.tempImg=cv2.imread("ImageSet/dummyBlack.jpg", 0)
         self.brightness_value_now = 0 
         self.brightness_value_now2 = 0 
         self.blur_value_now = 0 
@@ -138,6 +139,7 @@ class Ui_MainWindow(QWidget):
         self.autoEnhanceButton.setObjectName("autoEnhanceButton")
         self.autoEnhanceButton.setText("Auto Enhance")
         layout.addWidget(self.autoEnhanceButton)
+        self.autoEnhanceButton.clicked.connect(self.autoEnhance)
 
         self.horizontalLayout= QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
@@ -168,12 +170,21 @@ class Ui_MainWindow(QWidget):
         self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_2.setObjectName("pushButton_2")
         self.horizontalLayout_2.addWidget(self.pushButton_2)
+        self.pushButton_2.clicked.connect(self.loadImage)
 
         
         # save button
         self.pushButton = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton.setObjectName("pushButton")
         self.horizontalLayout_2.addWidget(self.pushButton)
+        self.pushButton.clicked.connect(self.savePhoto)
+
+        # reset button
+        self.pushButton_4 = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_4.setObjectName("pushButton_4")
+        self.horizontalLayout_2.addWidget(self.pushButton_4)
+        self.pushButton.clicked.connect(self.resetImage)
+
   
         # modal called
         self.retranslateUi(MainWindow)
@@ -202,13 +213,7 @@ class Ui_MainWindow(QWidget):
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
-
-        self.retranslateUi(MainWindow)
        
-        self.pushButton_2.clicked.connect(self.loadImage)
-        self.pushButton.clicked.connect(self.savePhoto)
-        self.autoEnhanceButton.clicked.connect(self.autoEnhance)
-        
         QtCore.QMetaObject.connectSlotsByName(MainWindow)   
 
 
@@ -216,11 +221,6 @@ class Ui_MainWindow(QWidget):
         print(self.channels[idx], " Channel Activated")
         self.selectedChannel = self.channels[idx]
 
-    def retranslateUi2(self, MainWindow):
-        _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.pushButton_3.setText(_translate("MainWindow", "Proceed"))
-        self.pushButton_3.clicked.connect(self.takeinputs)
 
 
     def takeinputs(self):
@@ -234,7 +234,7 @@ class Ui_MainWindow(QWidget):
         msg.exec_()
 
         # name, done1 = QtWidgets.QInputDialog.getText(
-        #      self, 'Input Dialog', 'Red Channel:')
+        #      self, 'Input Dialog'resetImage, 'Red Channel:')
         
         # pop=ColorCurvePopUp(self)
         # pop.show()
@@ -253,6 +253,11 @@ class Ui_MainWindow(QWidget):
             self.image = img
             self.setPhoto(img)
 
+    def resetImage(self):
+        self.image = self.tempImg
+        self.setPhoto(self.image)
+        self.isEnhanced=False
+
     def updateValue(self):
         self.brightness_value_now2 = self.verticalSlider.value()
         self.blur_value_now2 = self.verticalSlider_2.value()
@@ -265,6 +270,8 @@ class Ui_MainWindow(QWidget):
     def loadImage(self):
         self.filename = QFileDialog.getOpenFileName(filter="Image (*.*)")[0]
         self.image = cv2.imread(self.filename)
+        self.tempImg = self.image
+        self.isEnhanced=False
         self.setPhoto(self.image)
     
     def setPhoto(self,image):
@@ -313,6 +320,7 @@ class Ui_MainWindow(QWidget):
         self.pushButton_2.setText(_translate("MainWindow", "Open"))
         self.pushButton.setText(_translate("MainWindow", "Save"))
         self.pushButton_3.setText(_translate("MainWindow", "Alter Channel"))
+        self.pushButton_4.setText(_translate("MainWindow", "Reset Image"))
         
     
     def valuechange(self):
