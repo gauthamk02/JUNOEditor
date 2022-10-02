@@ -143,10 +143,11 @@ class Ui_MainWindow(QWidget):
         self.combo_box.activated[int].connect(self.RGBChannelActivated)
 
         #  button for selecting rgb channel
-        self.rgbChannelButton = QtWidgets.QPushButton(self.centralwidget)
-        self.rgbChannelButton.setObjectName("rgbChannelButton")
-        self.rgbChannelButton.setText("Alter Channel")
-        self.horizontalLayout.addWidget(self.rgbChannelButton)
+        self.pushButton_3 = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_3.setObjectName("pushButton_3")
+        self.pushButton_3.setText("Alter Channel")
+        self.horizontalLayout.addWidget(self.pushButton_3)
+        self.pushButton_3.clicked.connect(self.takeinputs)
 
         # --- buttons -------
 
@@ -163,14 +164,7 @@ class Ui_MainWindow(QWidget):
         self.pushButton = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton.setObjectName("pushButton")
         self.horizontalLayout_2.addWidget(self.pushButton)
-
-        #  button for selecting rgb channel
-        self.pushButton_3 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_3.setObjectName("pushButton_3")
-        self.pushButton_3.setText("Select Channel")
-        self.horizontalLayout_2.addWidget(self.pushButton_3)
-        self.pushButton_3.clicked.connect(self.takeinputs)
-        
+  
         # modal called
         self.retranslateUi(MainWindow)
 
@@ -219,28 +213,14 @@ class Ui_MainWindow(QWidget):
 
 
     def takeinputs(self):
-        name, done1 = QtWidgets.QInputDialog.getText(
-             self, 'Input Dialog', 'Red Channel:')
- 
-        roll, done2 = QtWidgets.QInputDialog.getInt(
-           self, 'Input Dialog', 'Green Channel:') 
- 
-        cgpa, done3 = QtWidgets.QInputDialog.getDouble(
-              self, 'Input Dialog', 'Blue Channel:')
- 
-        langs =['C', 'c++', 'Java', 'Python', 'Javascript']
-        # lang, done4 = QtWidgets.QInputDialog.getItem(
-        #   self, 'Input Dialog', 'Language you know:', langs)
- 
-        if done1 and done2 and done3  :
-             # Showing confirmation message along
-             # with information provided by user.
-            #  self.label.setText('Information stored Successfully\nName: '
-            #                      +str(name)+'('+str(roll)+')'+'\n'+'CGPA: '
-            #                      +str(cgpa)+'\nSelected Language: '+str(lang))  
-  
-             # Hide the pushbutton after inputs provided by the use.
-             self.pushButton.hide()          
+        # name, done1 = QtWidgets.QInputDialog.getText(
+        #      self, 'Input Dialog', 'Red Channel:')
+        # self.optionsLayout=
+        self.optionsLayout = QtWidgets.QVBoxLayout(self)
+        sl5 = QSlider(Qt.Horizontal).setMaximum(100)
+        self.optionsLayout.addWidget(sl5)
+        
+        # self.pushButton.hide()          
        
     def updateValue(self):
         self.brightness_value_now2 = self.verticalSlider.value()
@@ -326,7 +306,7 @@ class Ui_MainWindow(QWidget):
         MainWindow.setWindowTitle(_translate("MainWindow", "JUNO Photo Editor"))
         self.pushButton_2.setText(_translate("MainWindow", "Open"))
         self.pushButton.setText(_translate("MainWindow", "Save"))
-        self.pushButton_3.setText(_translate("MainWindow", "Choose"))
+        self.pushButton_3.setText(_translate("MainWindow", "Alter Channel"))
         
     
     def valuechange(self):
