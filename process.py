@@ -43,10 +43,14 @@ class Ui_MainWindow(QWidget):
 
         super(Ui_MainWindow, self).__init__(parent)
 
-        self.onlyRGB = True
-        self.image = cv2.imread("ImageSet/dummyBlack.jpg")
-        self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
-        self.image = np.array(self.image)
+        self.isInputTypeRGB = True
+        self.imageLoaded = False
+        self.imagesLoaded = [False, False, False]
+        self.image = np.zeros((1600,1600,3), np.uint8)
+        self.origImg = np.zeros((1600,1600,3), np.uint8)
+        self.image_r = None
+        self.image_g = None
+        self.image_b = None
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.initState()
@@ -76,7 +80,7 @@ class Ui_MainWindow(QWidget):
         self.selectedChannel="RED"
 
         MainWindow.setObjectName("MainWindow")
-        MainWindow.setFixedSize(1000, 800)
+        MainWindow.setFixedSize(1100, 800)
 
         self.centralwidget.setObjectName("centralwidget")
 
@@ -206,8 +210,8 @@ class Ui_MainWindow(QWidget):
         self.btngroup1.addButton(self.rbtn1)
         self.btngroup1.addButton(self.rbtn2)
         
-        self.rbtn1.toggled.connect(self.onClickedType)
-        self.rbtn2.toggled.connect(self.onClickedType)
+        self.rbtn1.toggled.connect(self.inputType)
+        self.rbtn2.toggled.connect(self.inputType)
         
         radioLayout = QtWidgets.QVBoxLayout()   
         radioLayout.addWidget(self.label1)
@@ -252,10 +256,16 @@ class Ui_MainWindow(QWidget):
         self.pushButton.clicked.connect(self.savePhoto)
 
         # reset button
-        self.pushButton_4 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_4.setObjectName("pushButton_4")
-        self.horizontalLayout_2.addWidget(self.pushButton_4)
-        self.pushButton_4.clicked.connect(self.resetImage)
+        self.resetImageButton = QtWidgets.QPushButton(self.centralwidget)
+        self.resetImageButton.setObjectName("pushButton_4")
+        self.horizontalLayout_2.addWidget(self.resetImageButton)
+        self.resetImageButton.clicked.connect(self.resetImage)
+
+        #discard button
+        self.discardButton = QtWidgets.QPushButton(self.centralwidget)
+        self.discardButton.setObjectName("pushButton_5")
+        self.horizontalLayout_2.addWidget(self.discardButton)
+        self.discardButton.clicked.connect(self.discardImage)
 
         # modal called
         self.retranslateUi(MainWindow)
@@ -290,7 +300,7 @@ class Ui_MainWindow(QWidget):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)   
 
 
-    def onClickedType(self):
+    def inputType(self):
         radioBtn = self.sender()
         if radioBtn.isChecked():
             self.label2.setText("You selected for " + radioBtn.text()+" upload")
@@ -300,11 +310,22 @@ class Ui_MainWindow(QWidget):
                 self.openButton_g.hide()
                 self.openButton_b.hide()
             else:
-                self.onlyRGB = False
+                self.isInputTypeRGB = False
                 self.openButton_r.show()
                 self.openButton_g.show()
                 self.openButton_b.show()
                 self.openButton.hide()
+
+            self.imagesLoaded = [False, False, False]
+    
+    def discardImage(self):
+        self.image = np.zeros((1600, 1600, 3), dtype=np.uint8)
+        self.origImg = np.zeros((1600, 1600, 3), dtype=np.uint8)
+        self.resetSlider()
+        self.initState()
+        self.imageLoaded = False
+        self.imagesLoaded = [False, False, False]
+        self.displayPhoto(self.image)
 
     def RGBChannelActivated(self,idx):
         print(self.channels[idx], " Channel Activated")
@@ -377,31 +398,76 @@ class Ui_MainWindow(QWidget):
         self.displayPhoto(self.image)
 
     def loadImage_r(self):
-        self.filename_r = QFileDialog.getOpenFileName(filter="Image (*.*)")[0]
-        self.image_r = cv2.imread(self.filename_r)
-        self.image_r = cv2.cvtColor(self.image_r, cv2.COLOR_BGR2RGB)
+        self.filename_b = QFileDialog.getOpenFileName(filter="Image (*.*)")[0]
+        self.image_r = cv2.imread(self.filename_b, 0)
         self.image_r = np.array(self.image_r)
-        self.origImg = self.image_r
-        self.initState()
-        self.displayPhoto(self.image_r)
+        if(self.image_r.shape[0] != self.image.shape[1] or self.image_r.shape[1] != self.image.shape[0]):
+            if self.imageLoaded:
+                QMessageBox.about(self, "Error", "Image dimensions do not match. Please discard the image and load again")
+                return
+            else:
+                self.image = np.zeros((self.image_r.shape[0],self.image_r.shape[1],3), np.uint8)
+                self.image[:,:,0] = self.image_r
+                self.origImg = self.image
+                self.initState()
+                self.displayPhoto(self.image)
+        else:
+            self.image[:,:,0] = self.image_r
+            self.origImg = self.image
+            self.initState()
+            self.displayPhoto(self.image)
+
+        self.imagesLoaded[0] = True
+        if self.imagesLoaded[0] and self.imagesLoaded[1] and self.imagesLoaded[2]:
+            self.imageLoaded = True
 
     def loadImage_g(self):
-        self.filename_g = QFileDialog.getOpenFileName(filter="Image (*.*)")[0]
-        self.image_r = cv2.imread(self.filename_g)
-        self.image_r = cv2.cvtColor(self.image_r, cv2.COLOR_BGR2RGB)
-        self.image_r = np.array(self.image_r)
-        self.origImg = self.image_r
-        self.initState()
-        self.displayPhoto(self.image_r)
+            self.filename_g = QFileDialog.getOpenFileName(filter="Image (*.*)")[0]
+            self.image_g = cv2.imread(self.filename_g, 0)
+            self.image_g = np.array(self.image_g)
+            if(self.image_g.shape[0] != self.image_r.shape[0] or self.image_g.shape[1] != self.image_r.shape[1]):
+                if self.imageLoaded:
+                    QMessageBox.about(self, "Error", "Image dimensions do not match. Please discard the image and load again")
+                    return
+                else:
+                    self.image = np.zeros((self.image_g.shape[0],self.image_g.shape[1],3), np.uint8)
+                    self.image[:,:,1] = self.image_g
+                    self.origImg = self.image
+                    self.initState()
+                    self.displayPhoto(self.image)
+            else:
+                self.image[:,:,1] = self.image_g
+                self.origImg = self.image
+                self.initState()
+                self.displayPhoto(self.image)
+
+            self.imagesLoaded[1] = True
+            if self.imagesLoaded[0] and self.imagesLoaded[1] and self.imagesLoaded[2]:
+                self.imageLoaded = True
 
     def loadImage_b(self):
         self.filename_b = QFileDialog.getOpenFileName(filter="Image (*.*)")[0]
-        self.image_r = cv2.imread(self.filename_b)
-        self.image_r = cv2.cvtColor(self.image_r, cv2.COLOR_BGR2RGB)
-        self.image_r = np.array(self.image_r)
-        self.origImg = self.image_r
-        self.initState()
-        self.displayPhoto(self.image_r)
+        self.image_b = cv2.imread(self.filename_b, 0)
+        self.image_b = np.array(self.image_b)
+        if(self.image_b.shape[0] != self.image_g.shape[0] or self.image_b.shape[1] != self.image_g.shape[1]):
+            if self.imageLoaded:
+                QMessageBox.about(self, "Error", "Image dimensions do not match. Please discard the image and load again")
+                return
+            else:
+                self.image = np.zeros((self.image_b.shape[0],self.image_b.shape[1],3), np.uint8)
+                self.image[:,:,2] = self.image_b
+                self.origImg = self.image
+                self.initState()
+                self.displayPhoto(self.image)
+        else:
+            self.image[:,:,2] = self.image_b
+            self.origImg = self.image
+            self.initState()
+            self.displayPhoto(self.image)
+
+        self.imagesLoaded[2] = True
+        if self.imagesLoaded[0] and self.imagesLoaded[1] and self.imagesLoaded[2]:
+            self.imageLoaded = True
     
     def displayPhoto(self,image):
         self.tmp = image
@@ -433,7 +499,8 @@ class Ui_MainWindow(QWidget):
         MainWindow.setWindowTitle(_translate("MainWindow", "JUNO Photo Editor"))
         self.openButton.setText(_translate("MainWindow", "Upload Image"))
         self.pushButton.setText(_translate("MainWindow", "Save"))
-        self.pushButton_4.setText(_translate("MainWindow", "Reset Image"))
+        self.resetImageButton.setText(_translate("MainWindow", "Reset Image"))
+        self.discardButton.setText(_translate("MainWindow", "Discard Image"))
 
     def valuechange(self):
         self.r_val = self.redSlider.value()
