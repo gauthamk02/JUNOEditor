@@ -62,4 +62,17 @@ class Processing:
         img = ImageEnhance.Sharpness(Image.fromarray(img)).enhance((value + 100) / 100)
         return np.array(img)
 
-    
+    def changeSaturation(img,value):
+        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        h, s, v = cv2.split(hsv)
+        if value >= 0:
+            lim = 255 - value
+            s[s > lim] = 255
+            s[s <= lim] += value
+        else:
+            lim = abs(value)
+            s[s < lim] = 0
+            s[s >= lim] -= abs(value)
+        final_hsv = cv2.merge((h, s, v))
+        img = cv2.cvtColor(final_hsv, cv2.COLOR_HSV2BGR)
+        return img

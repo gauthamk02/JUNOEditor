@@ -30,6 +30,9 @@ INIT_SHARPNESS = 0
 MAX_SHARPNESS = 100
 MIN_SHARPNESS = 0
 
+INIT_SATURATION = 0
+MAX_SATURATION = 100
+MIN_SATURATION = 0
 
 os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = QLibraryInfo.location(
     QLibraryInfo.PluginsPath)
@@ -58,6 +61,7 @@ class Ui_MainWindow(QWidget):
         self.blur_value = INIT_BLUR
         self.contrast_value = INIT_CONTRAST
         self.sharpness_value= INIT_SHARPNESS
+        self.saturation_value = INIT_SATURATION
         self.isEnhanced=False
 
     def setupUi(self):
@@ -134,6 +138,20 @@ class Ui_MainWindow(QWidget):
         self.sharpnessSlider.valueChanged.connect(self.updateValue)
         self.verticalLayout.addWidget(self.sharpnessSlider)
 
+        # saturation slider
+        self.saturationSlider = QtWidgets.QSlider(self.centralwidget)
+        self.saturationSlider.setOrientation(QtCore.Qt.Horizontal)
+        self.saturationSlider.setObjectName("verticalSlider_5")
+        self.saturationSlider.setValue(self.saturation_value)
+        self.saturationSlider.setMinimum(MIN_SATURATION)
+        self.saturationSlider.setMaximum(MAX_SATURATION)
+        self.saturationLabel = QLabel("Saturation: " + str(self.saturation_value))
+        self.saturationLabel.setAlignment(Qt.AlignCenter)
+        self.verticalLayout.addWidget(self.saturationLabel)
+        self.saturationSlider.valueChanged.connect(self.updateValue)
+        self.verticalLayout.addWidget(self.saturationSlider)
+
+
         layout = self.verticalLayout
         self.redLabel = QLabel("Red: " + str(INIT_RGBVAL))
         self.redLabel.setAlignment(Qt.AlignCenter)
@@ -176,9 +194,10 @@ class Ui_MainWindow(QWidget):
         self.autoEnhanceButton.clicked.connect(self.autoEnhance)
 
         # radio buttons 
-        self.label1 = QLabel('Give the image input type?')
+        self.label1 = QLabel('Select image input type:')
         self.rbtn1 = QRadioButton('Single RGB image')
-        self.rbtn2 = QRadioButton('multiple RGB channel images')
+        self.rbtn1.setChecked(True)
+        self.rbtn2 = QRadioButton('Multiple RGB channel images')
         self.label2 = QLabel("")
         
         self.btngroup1 = QButtonGroup()
@@ -187,8 +206,8 @@ class Ui_MainWindow(QWidget):
         self.btngroup1.addButton(self.rbtn1)
         self.btngroup1.addButton(self.rbtn2)
         
-        self.rbtn1.toggled.connect(self.onClickedCity)
-        self.rbtn2.toggled.connect(self.onClickedCity)
+        self.rbtn1.toggled.connect(self.onClickedType)
+        self.rbtn2.toggled.connect(self.onClickedType)
         
         radioLayout = QtWidgets.QVBoxLayout()   
         radioLayout.addWidget(self.label1)
@@ -212,19 +231,19 @@ class Ui_MainWindow(QWidget):
         self.openButton_r.setObjectName("openButton_r")
         self.openButton_r.setText("Upload Red channel image")
         self.horizontalLayout_2.addWidget(self.openButton_r)
-        # self.openButton_r.clicked.connect(self.loadImage_r)
+        self.openButton_r.clicked.connect(self.loadImage_r)
 
         self.openButton_g = QtWidgets.QPushButton(self.centralwidget)
         self.openButton_g.setObjectName("openButton_g")
         self.openButton_g.setText("Upload Green channel image")
         self.horizontalLayout_2.addWidget(self.openButton_g)
-        # self.openButton_g.clicked.connect(self.loadImage_g)
+        self.openButton_g.clicked.connect(self.loadImage_g)
 
         self.openButton_b = QtWidgets.QPushButton(self.centralwidget)
         self.openButton_b.setObjectName("openButton_b")
         self.openButton_b.setText("Upload Blue channel image")
         self.horizontalLayout_2.addWidget(self.openButton_b)
-        # self.openButton_b.clicked.connect(self.loadImage_b)
+        self.openButton_b.clicked.connect(self.loadImage_b)
         
         # save button
         self.pushButton = QtWidgets.QPushButton(self.centralwidget)
@@ -263,11 +282,15 @@ class Ui_MainWindow(QWidget):
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
+
+        self.openButton_r.hide()
+        self.openButton_g.hide()
+        self.openButton_b.hide()
        
         QtCore.QMetaObject.connectSlotsByName(MainWindow)   
 
 
-    def onClickedCity(self):
+    def onClickedType(self):
         radioBtn = self.sender()
         if radioBtn.isChecked():
             self.label2.setText("You selected for " + radioBtn.text()+" upload")
@@ -319,6 +342,8 @@ class Ui_MainWindow(QWidget):
         self.blurLabel.setText("Blur: " + str(INIT_BLUR))
         self.sharpnessSlider.setValue(INIT_SHARPNESS)
         self.sharpnessLabel.setText("Sharpness: " + str(INIT_SHARPNESS))
+        self.saturationSlider.setValue(INIT_SATURATION)
+        self.saturationLabel.setText("Saturation: " + str(INIT_SATURATION))
 
     def resetImage(self):
         self.image = self.origImg
@@ -332,11 +357,13 @@ class Ui_MainWindow(QWidget):
         self.blur_value = self.blurSlider.value()
         self.contrast_value = self.contrastSlider.value()
         self.sharpness_value = self.sharpnessSlider.value()
+        self.saturation_value = self.saturationSlider.value()
 
         self.brightnessLabel.setText("Brightness: " + str(self.brightness_value))
         self.blurLabel.setText("Blur: " + str(self.blur_value))
         self.contrastLabel.setText("Contrast: " + str(self.contrast_value))
         self.sharpnessLabel.setText("Sharpness: " + str(self.sharpness_value))
+        self.saturationLabel.setText("Saturation: " + str(self.saturation_value))
 
         self.update()
 
@@ -388,6 +415,7 @@ class Ui_MainWindow(QWidget):
         img = ip.changeBlur(img,self.blur_value)
         img = ip.changeContrast(img,self.contrast_value)
         img = ip.changeSharpness(img,self.sharpness_value)
+        img = ip.changeSaturation(img,self.saturation_value)
 
         img = ip.channel_correction(img.copy(
         ), (0, 1, 2), (self.r_val / 100, self.g_val / 100, self.b_val / 100))
