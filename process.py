@@ -174,24 +174,26 @@ class Ui_MainWindow(QWidget):
         layout.addWidget(self.autoEnhanceButton)
         self.autoEnhanceButton.clicked.connect(self.autoEnhance)
 
-        self.horizontalLayout= QtWidgets.QHBoxLayout(self.centralwidget)
-        self.horizontalLayout.setObjectName("horizontalLayout")
-
-        # dropdown for rgb channel selection
-        self.combo_box = QComboBox(self)
-        self.combo_box.setObjectName("combo_box")
-        self.combo_box.setGeometry(100, 100, 100, 50)
-        for channel in self.channels:
-            self.combo_box.addItem(channel)
-        self.horizontalLayout.addWidget(self.combo_box)
-        self.combo_box.activated[int].connect(self.RGBChannelActivated)
-
-        #  button for selecting rgb channel
-        self.alterChannelButton = QtWidgets.QPushButton(self.centralwidget)
-        self.alterChannelButton.setObjectName("pushButton_3")
-        self.alterChannelButton.setText("Alter Channel")
-        self.horizontalLayout.addWidget(self.alterChannelButton)
-        self.alterChannelButton.clicked.connect(self.takeinputs)
+        # radio buttons ki kundali
+        self.label1 = QLabel('would u want to touch anshuman?')
+        self.rbtn1 = QRadioButton('yes')
+        self.rbtn2 = QRadioButton('absolutely')
+        self.label2 = QLabel("")
+        
+        self.btngroup1 = QButtonGroup()
+        self.btngroup2 = QButtonGroup()
+        
+        self.btngroup1.addButton(self.rbtn1)
+        self.btngroup1.addButton(self.rbtn2)
+        
+        self.rbtn1.toggled.connect(self.onClickedCity)
+        self.rbtn2.toggled.connect(self.onClickedCity)
+        
+        radioLayout = QtWidgets.QVBoxLayout()   
+        radioLayout.addWidget(self.label1)
+        radioLayout.addWidget(self.rbtn1)
+        radioLayout.addWidget(self.rbtn2)
+        radioLayout.addWidget(self.label2)
 
         # --- buttons -------
 
@@ -219,7 +221,6 @@ class Ui_MainWindow(QWidget):
         self.openButton_b.setObjectName("openButton_b")
         self.horizontalLayout_2.addWidget(self.openButton_b)
         # self.openButton_b.clicked.connect(self.loadImage_b)
-
         
         # save button
         self.pushButton = QtWidgets.QPushButton(self.centralwidget)
@@ -233,7 +234,6 @@ class Ui_MainWindow(QWidget):
         self.horizontalLayout_2.addWidget(self.pushButton_4)
         self.pushButton_4.clicked.connect(self.resetImage)
 
-  
         # modal called
         self.retranslateUi(MainWindow)
 
@@ -242,13 +242,12 @@ class Ui_MainWindow(QWidget):
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         self.horizontalLayout_3.addLayout(self.verticalLayout)
         self.horizontalLayout_3.setContentsMargins(0,0,0,0)
-        # self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setText("Upload Image")
         self.label.setObjectName("label")
         self.horizontalLayout_3.addWidget(self.label)
 
         self.gridLayout = QtWidgets.QGridLayout()
-        self.gridLayout.addLayout(self.horizontalLayout, 1, 0, 1, 1)
+        self.gridLayout.addLayout(radioLayout, 1, 0, 1, 1)
         self.gridLayout.addLayout(self.horizontalLayout_2, 2, 0, 4, 1)
         self.gridLayout.addLayout(self.horizontalLayout_3, 0, 0, 1, 0)
         
@@ -263,6 +262,11 @@ class Ui_MainWindow(QWidget):
        
         QtCore.QMetaObject.connectSlotsByName(MainWindow)   
 
+
+    def onClickedCity(self):
+        radioBtn = self.sender()
+        if radioBtn.isChecked():
+            self.label2.setText("You selected option " + radioBtn.text())
 
     def RGBChannelActivated(self,idx):
         print(self.channels[idx], " Channel Activated")
@@ -386,7 +390,6 @@ class Ui_MainWindow(QWidget):
         MainWindow.setWindowTitle(_translate("MainWindow", "JUNO Photo Editor"))
         self.openButton.setText(_translate("MainWindow", "Open"))
         self.pushButton.setText(_translate("MainWindow", "Save"))
-        self.alterChannelButton.setText(_translate("MainWindow", "Alter Channel"))
         self.pushButton_4.setText(_translate("MainWindow", "Reset Image"))
 
     def valuechange(self):
