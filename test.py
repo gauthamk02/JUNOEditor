@@ -62,7 +62,10 @@ class Ui_MainWindow(QWidget):
     def setupUi(self):
         
          # Added code here  
-        self.filename = None 
+        self.filename = None
+        self.filename_r = None
+        self.filename_g = None
+        self.filename_b = None 
         self.tmp = None 
         self.channels=["RED","GREEN","BLUE"]
         self.selectedChannel="RED"
@@ -196,10 +199,26 @@ class Ui_MainWindow(QWidget):
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
 
         # open button
-        self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_2.setObjectName("pushButton_2")
-        self.horizontalLayout_2.addWidget(self.pushButton_2)
-        self.pushButton_2.clicked.connect(self.loadImage)
+        self.openButton = QtWidgets.QPushButton(self.centralwidget)
+        self.openButton.setObjectName("openButton")
+        self.horizontalLayout_2.addWidget(self.openButton)
+        self.openButton.clicked.connect(self.loadImage)
+
+        ## three images for rgb channels
+        self.openButton_r = QtWidgets.QPushButton(self.centralwidget)
+        self.openButton_r.setObjectName("openButton_r")
+        self.horizontalLayout_2.addWidget(self.openButton_r)
+        # self.openButton_r.clicked.connect(self.loadImage_r)
+
+        self.openButton_g = QtWidgets.QPushButton(self.centralwidget)
+        self.openButton_g.setObjectName("openButton_g")
+        self.horizontalLayout_2.addWidget(self.openButton_g)
+        # self.openButton_g.clicked.connect(self.loadImage_g)
+
+        self.openButton_b = QtWidgets.QPushButton(self.centralwidget)
+        self.openButton_b.setObjectName("openButton_b")
+        self.horizontalLayout_2.addWidget(self.openButton_b)
+        # self.openButton_b.clicked.connect(self.loadImage_b)
 
         
         # save button
@@ -259,6 +278,7 @@ class Ui_MainWindow(QWidget):
                
     def autoEnhance(self):
         if(self.isEnhanced == False):
+            self.resetSlider()
             img = ip.auto_enhance(self.origImg)
             self.isEnhanced = True
             self.image = img
@@ -309,6 +329,33 @@ class Ui_MainWindow(QWidget):
         self.origImg = self.image
         self.initState()
         self.displayPhoto(self.image)
+
+    def loadImage_r(self):
+        self.filename_r = QFileDialog.getOpenFileName(filter="Image (*.*)")[0]
+        self.image_r = cv2.imread(self.filename_r)
+        self.image_r = cv2.cvtColor(self.image_r, cv2.COLOR_BGR2RGB)
+        self.image_r = np.array(self.image_r)
+        self.origImg = self.image_r
+        self.initState()
+        self.displayPhoto(self.image_r)
+
+    def loadImage_g(self):
+        self.filename_g = QFileDialog.getOpenFileName(filter="Image (*.*)")[0]
+        self.image_r = cv2.imread(self.filename_g)
+        self.image_r = cv2.cvtColor(self.image_r, cv2.COLOR_BGR2RGB)
+        self.image_r = np.array(self.image_r)
+        self.origImg = self.image_r
+        self.initState()
+        self.displayPhoto(self.image_r)
+
+    def loadImage_b(self):
+        self.filename_b = QFileDialog.getOpenFileName(filter="Image (*.*)")[0]
+        self.image_r = cv2.imread(self.filename_b)
+        self.image_r = cv2.cvtColor(self.image_r, cv2.COLOR_BGR2RGB)
+        self.image_r = np.array(self.image_r)
+        self.origImg = self.image_r
+        self.initState()
+        self.displayPhoto(self.image_r)
     
     def displayPhoto(self,image):
         self.tmp = image
@@ -325,12 +372,10 @@ class Ui_MainWindow(QWidget):
 
         img = ip.channel_correction(img.copy(
         ), (0, 1, 2), (self.r_val / 100, self.g_val / 100, self.b_val / 100))
-
         self.image = img
         self.displayPhoto(img)
     
     def savePhoto(self):
-        
         filename = QFileDialog.getSaveFileName(filter="JPG(*.jpg);;PNG(*.png);;TIFF(*.tiff);;BMP(*.bmp)")[0]
         img = cv2.cvtColor(self.image, cv2.COLOR_RGB2BGR)
         cv2.imwrite(filename,img)
@@ -339,11 +384,11 @@ class Ui_MainWindow(QWidget):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "JUNO Photo Editor"))
-        self.pushButton_2.setText(_translate("MainWindow", "Open"))
+        self.openButton.setText(_translate("MainWindow", "Open"))
         self.pushButton.setText(_translate("MainWindow", "Save"))
         self.alterChannelButton.setText(_translate("MainWindow", "Alter Channel"))
         self.pushButton_4.setText(_translate("MainWindow", "Reset Image"))
-    
+
     def valuechange(self):
         self.r_val = self.redSlider.value()
         self.g_val = self.greenSlider.value()
@@ -351,10 +396,11 @@ class Ui_MainWindow(QWidget):
         self.redLabel.setText("Red: " + str(self.r_val))
         self.greenLabel.setText("Green: " + str(self.g_val))
         self.blueLabel.setText("Blue: " + str(self.b_val))
+        self.isEnhanced=False
         self.update()
 
 if __name__ == "__main__":
-    import sys
+    import sys## three images for rgb channels
     app = QtWidgets.QApplication(sys.argv)
     style = """
         QWidget{

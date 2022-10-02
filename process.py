@@ -26,6 +26,11 @@ INIT_CONTRAST = 0
 MAX_CONTRAST = 100
 MIN_CONTRAST = 0
 
+INIT_SHARPNESS = 0
+MAX_SHARPNESS = 100
+MIN_SHARPNESS = 0
+
+
 os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = QLibraryInfo.location(
     QLibraryInfo.PluginsPath)
 
@@ -42,7 +47,7 @@ class Ui_MainWindow(QWidget):
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.initState()
         self.setupUi()
-        self.setPhoto(self.image)
+        self.displayPhoto(self.image)
 
     def initState(self):
         self.r_val = INIT_RGBVAL
@@ -51,12 +56,16 @@ class Ui_MainWindow(QWidget):
         self.brightness_value = INIT_BRIGHTNESS
         self.blur_value = INIT_BLUR
         self.contrast_value = INIT_CONTRAST
+        self.sharpness_value= INIT_SHARPNESS
         self.isEnhanced=False
 
     def setupUi(self):
         
          # Added code here  
-        self.filename = None 
+        self.filename = None
+        self.filename_r = None
+        self.filename_g = None
+        self.filename_b = None 
         self.tmp = None 
         self.channels=["RED","GREEN","BLUE"]
         self.selectedChannel="RED"
@@ -111,6 +120,19 @@ class Ui_MainWindow(QWidget):
         self.contrastSlider.valueChanged.connect(self.updateValue)
         self.verticalLayout.addWidget(self.contrastSlider)
 
+        # sharpnesss slider
+        self.sharpnessSlider = QtWidgets.QSlider(self.centralwidget)
+        self.sharpnessSlider.setOrientation(QtCore.Qt.Horizontal)
+        self.sharpnessSlider.setObjectName("verticalSlider_4")
+        self.sharpnessSlider.setValue(self.sharpness_value)
+        self.sharpnessSlider.setMinimum(MIN_SHARPNESS)
+        self.sharpnessSlider.setMaximum(MAX_SHARPNESS)
+        self.sharpnessLabel = QLabel("Sharpness: " + str(self.sharpness_value))
+        self.sharpnessLabel.setAlignment(Qt.AlignCenter)
+        self.verticalLayout.addWidget(self.sharpnessLabel)
+        self.sharpnessSlider.valueChanged.connect(self.updateValue)
+        self.verticalLayout.addWidget(self.sharpnessSlider)
+
         layout = self.verticalLayout
         self.redLabel = QLabel("Red: " + str(INIT_RGBVAL))
         self.redLabel.setAlignment(Qt.AlignCenter)
@@ -152,7 +174,7 @@ class Ui_MainWindow(QWidget):
         layout.addWidget(self.autoEnhanceButton)
         self.autoEnhanceButton.clicked.connect(self.autoEnhance)
 
-        self.horizontalLayout= QtWidgets.QHBoxLayout()
+        self.horizontalLayout= QtWidgets.QHBoxLayout(self.centralwidget)
         self.horizontalLayout.setObjectName("horizontalLayout")
 
         # dropdown for rgb channel selection
@@ -177,10 +199,26 @@ class Ui_MainWindow(QWidget):
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
 
         # open button
-        self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_2.setObjectName("pushButton_2")
-        self.horizontalLayout_2.addWidget(self.pushButton_2)
-        self.pushButton_2.clicked.connect(self.loadImage)
+        self.openButton = QtWidgets.QPushButton(self.centralwidget)
+        self.openButton.setObjectName("openButton")
+        self.horizontalLayout_2.addWidget(self.openButton)
+        self.openButton.clicked.connect(self.loadImage)
+
+        ## three images for rgb channels
+        self.openButton_r = QtWidgets.QPushButton(self.centralwidget)
+        self.openButton_r.setObjectName("openButton_r")
+        self.horizontalLayout_2.addWidget(self.openButton_r)
+        # self.openButton_r.clicked.connect(self.loadImage_r)
+
+        self.openButton_g = QtWidgets.QPushButton(self.centralwidget)
+        self.openButton_g.setObjectName("openButton_g")
+        self.horizontalLayout_2.addWidget(self.openButton_g)
+        # self.openButton_g.clicked.connect(self.loadImage_g)
+
+        self.openButton_b = QtWidgets.QPushButton(self.centralwidget)
+        self.openButton_b.setObjectName("openButton_b")
+        self.horizontalLayout_2.addWidget(self.openButton_b)
+        # self.openButton_b.clicked.connect(self.loadImage_b)
 
         
         # save button
@@ -231,22 +269,21 @@ class Ui_MainWindow(QWidget):
         self.selectedChannel = self.channels[idx]
 
     def takeinputs(self):
-
         msg=QMessageBox()
         msg.setWindowTitle("Input Dialog")
-        msg.setText("Color curver value for Red Channel")
-        slider=QSlider(Qt.Horizontal)
-        msg.addAction(slider)
+        msgStr="Color curver value for "+self.selectedChannel+" Channel"
+        msg.setText(msgStr)
         msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
         msg.exec_()        
                
     def autoEnhance(self):
         if(self.isEnhanced == False):
-            img = ip.auto_enhance(self.image)
-            self.isEnhanced=True
+            self.resetSlider()
+            img = ip.auto_enhance(self.origImg)
+            self.isEnhanced = True
             self.image = img
-            self.setPhoto(img)
-
+            self.displayPhoto(img)
+            
     def resetSlider(self):
         self.redSlider.setValue(INIT_RGBVAL)
         self.redLabel.setText("Red: " + str(INIT_RGBVAL))
@@ -261,10 +298,12 @@ class Ui_MainWindow(QWidget):
         self.brightnessLabel.setText("Brightness: " + str(INIT_BRIGHTNESS))
         self.blurSlider.setValue(INIT_BLUR)
         self.blurLabel.setText("Blur: " + str(INIT_BLUR))
+        self.sharpnessSlider.setValue(INIT_SHARPNESS)
+        self.sharpnessLabel.setText("Sharpness: " + str(INIT_SHARPNESS))
 
     def resetImage(self):
         self.image = self.origImg
-        self.setPhoto(self.image)
+        self.displayPhoto(self.image)
         
         self.initState()
         self.resetSlider()
@@ -273,10 +312,12 @@ class Ui_MainWindow(QWidget):
         self.brightness_value = self.brightnessSlider.value()
         self.blur_value = self.blurSlider.value()
         self.contrast_value = self.contrastSlider.value()
+        self.sharpness_value = self.sharpnessSlider.value()
 
         self.brightnessLabel.setText("Brightness: " + str(self.brightness_value))
         self.blurLabel.setText("Blur: " + str(self.blur_value))
         self.contrastLabel.setText("Contrast: " + str(self.contrast_value))
+        self.sharpnessLabel.setText("Sharpness: " + str(self.sharpness_value))
 
         self.update()
 
@@ -287,9 +328,36 @@ class Ui_MainWindow(QWidget):
         self.image = np.array(self.image)
         self.origImg = self.image
         self.initState()
-        self.setPhoto(self.image)
+        self.displayPhoto(self.image)
+
+    def loadImage_r(self):
+        self.filename_r = QFileDialog.getOpenFileName(filter="Image (*.*)")[0]
+        self.image_r = cv2.imread(self.filename_r)
+        self.image_r = cv2.cvtColor(self.image_r, cv2.COLOR_BGR2RGB)
+        self.image_r = np.array(self.image_r)
+        self.origImg = self.image_r
+        self.initState()
+        self.displayPhoto(self.image_r)
+
+    def loadImage_g(self):
+        self.filename_g = QFileDialog.getOpenFileName(filter="Image (*.*)")[0]
+        self.image_r = cv2.imread(self.filename_g)
+        self.image_r = cv2.cvtColor(self.image_r, cv2.COLOR_BGR2RGB)
+        self.image_r = np.array(self.image_r)
+        self.origImg = self.image_r
+        self.initState()
+        self.displayPhoto(self.image_r)
+
+    def loadImage_b(self):
+        self.filename_b = QFileDialog.getOpenFileName(filter="Image (*.*)")[0]
+        self.image_r = cv2.imread(self.filename_b)
+        self.image_r = cv2.cvtColor(self.image_r, cv2.COLOR_BGR2RGB)
+        self.image_r = np.array(self.image_r)
+        self.origImg = self.image_r
+        self.initState()
+        self.displayPhoto(self.image_r)
     
-    def setPhoto(self,image):
+    def displayPhoto(self,image):
         self.tmp = image
         image = imutils.resize(image,width=640)
         image = QImage(image, image.shape[1],image.shape[0],image.strides[0],QImage.Format_RGB888)
@@ -297,30 +365,30 @@ class Ui_MainWindow(QWidget):
     
     def update(self):
         brightness = np.interp(self.brightness_value, [-100, 100], [-255, 255]).astype(np.int64)
-        img = ip.changeBrightness(self.image, brightness)
+        img = ip.changeBrightness(self.origImg, brightness)
         img = ip.changeBlur(img,self.blur_value)
         img = ip.changeContrast(img,self.contrast_value)
+        img = ip.changeSharpness(img,self.sharpness_value)
 
         img = ip.channel_correction(img.copy(
         ), (0, 1, 2), (self.r_val / 100, self.g_val / 100, self.b_val / 100))
-
-        self.setPhoto(img)
+        self.image = img
+        self.displayPhoto(img)
     
     def savePhoto(self):
-        
         filename = QFileDialog.getSaveFileName(filter="JPG(*.jpg);;PNG(*.png);;TIFF(*.tiff);;BMP(*.bmp)")[0]
-        
-        cv2.imwrite(filename,self.tmp)
-        print('Image saved as:',self.filename)
+        img = cv2.cvtColor(self.image, cv2.COLOR_RGB2BGR)
+        cv2.imwrite(filename,img)
+        print('Image saved as:',filename)
     
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "JUNO Photo Editor"))
-        self.pushButton_2.setText(_translate("MainWindow", "Open"))
+        self.openButton.setText(_translate("MainWindow", "Open"))
         self.pushButton.setText(_translate("MainWindow", "Save"))
         self.alterChannelButton.setText(_translate("MainWindow", "Alter Channel"))
         self.pushButton_4.setText(_translate("MainWindow", "Reset Image"))
-    
+
     def valuechange(self):
         self.r_val = self.redSlider.value()
         self.g_val = self.greenSlider.value()
@@ -328,10 +396,11 @@ class Ui_MainWindow(QWidget):
         self.redLabel.setText("Red: " + str(self.r_val))
         self.greenLabel.setText("Green: " + str(self.g_val))
         self.blueLabel.setText("Blue: " + str(self.b_val))
+        self.isEnhanced=False
         self.update()
 
 if __name__ == "__main__":
-    import sys
+    import sys## three images for rgb channels
     app = QtWidgets.QApplication(sys.argv)
     style = """
         QWidget{
@@ -374,7 +443,6 @@ if __name__ == "__main__":
             padding: 10px;
         }
         QComboBox::drop-down {
-            
             margin: 6px;
             }
     """
