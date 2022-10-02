@@ -10,9 +10,21 @@ import numpy as np
 import os
 from colorCurvePopUp import ColorCurvePopUp
 
-INIT_VAL = 100
-MAX_VAL = 100
-MIN_VAL = 0
+INIT_RGBVAL = 100
+MAX_RGBVAL = 100
+MIN_RGBVAL = 0
+
+INIT_BRIGHTNESS = 0
+MAX_BRIGHTNESS = 100
+MIN_BRIGHTNESS = -100
+
+INIT_BLUR = 0
+MAX_BLUR = 100
+MIN_BLUR = 0
+
+INIT_CONTRAST = 0
+MAX_CONTRAST = 100
+MIN_CONTRAST = 0
 
 os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = QLibraryInfo.location(
     QLibraryInfo.PluginsPath)
@@ -27,15 +39,17 @@ class Ui_MainWindow(QWidget):
         self.isEnhanced = False
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.label = QtWidgets.QLabel(self.centralwidget)
+        self.initState()
         self.setupUi()
         self.setPhoto(self.image)
-        self.initState()
 
     def initState(self):
-        self.r_val = INIT_VAL
-        self.g_val = INIT_VAL
-        self.b_val = INIT_VAL
-        
+        self.r_val = INIT_RGBVAL
+        self.g_val = INIT_RGBVAL
+        self.b_val = INIT_RGBVAL
+        self.brightness_value = INIT_BRIGHTNESS
+        self.blur_value = INIT_BLUR
+        self.contrast_value = INIT_CONTRAST
 
     def setupUi(self):
         
@@ -43,12 +57,6 @@ class Ui_MainWindow(QWidget):
         self.filename = None 
         self.tmp = None 
         self.tempImg=cv2.imread("ImageSet/dummyBlack.jpg", 0)
-        self.brightness_value_now = 0 
-        self.brightness_value_now2 = 0 
-        self.blur_value_now = 0 
-        self.blur_value_now2 = 0
-        self.contrast_value_now = 0 
-        self.contrast_value_now2 = 0
         self.channels=["RED","GREEN","BLUE"]
         self.selectedChannel="RED"
 
@@ -65,74 +73,77 @@ class Ui_MainWindow(QWidget):
         self.verticalLayout.setObjectName("verticalLayout")
 
         # brightness slider
-        self.verticalSlider = QtWidgets.QSlider(self.centralwidget)
-        self.verticalSlider.setOrientation(QtCore.Qt.Horizontal)
-        self.verticalSlider.setObjectName("verticalSlider")
-        self.verticalSlider.setValue(self.brightness_value_now2)
-        self.verticalSlider.setMinimum(-100)
-        self.verticalSlider.setMaximum(100)
-        self.l1 = QLabel("Brightness: " + str(self.brightness_value_now2))
-        self.l1.setAlignment(Qt.AlignCenter)
-        self.verticalLayout.addWidget(self.l1)
-        self.verticalSlider.valueChanged.connect(self.updateValue)
-        self.verticalLayout.addWidget(self.verticalSlider)
-        self.verticalSlider.valueChanged['int'].connect(self.brightness_value)
+        self.brightnessSlider = QtWidgets.QSlider(self.centralwidget)
+        self.brightnessSlider.setOrientation(QtCore.Qt.Horizontal)
+        self.brightnessSlider.setObjectName("verticalSlider")
+        self.brightnessSlider.setValue(self.brightness_value)
+        self.brightnessSlider.setMinimum(-100)
+        self.brightnessSlider.setMaximum(100)
+        self.brightnessLabel = QLabel("Brightness: " + str(self.brightness_value))
+        self.brightnessLabel.setAlignment(Qt.AlignCenter)
+        self.verticalLayout.addWidget(self.brightnessLabel)
+        self.brightnessSlider.valueChanged.connect(self.updateValue)
+        self.verticalLayout.addWidget(self.brightnessSlider)
         
         # blur slider
-        self.verticalSlider_2 = QtWidgets.QSlider(self.centralwidget)
-        self.verticalSlider_2.setOrientation(QtCore.Qt.Horizontal)
-        self.verticalSlider_2.setObjectName("verticalSlider_2")
-        self.l2 = QLabel("Blur: " + str(self.blur_value_now2))
-        self.l2.setAlignment(Qt.AlignCenter)
-        self.verticalLayout.addWidget(self.l2)
-        self.verticalSlider_2.valueChanged.connect(self.updateValue)
-        self.verticalLayout.addWidget(self.verticalSlider_2)
-        self.verticalSlider_2.valueChanged['int'].connect(self.blur_value)
+        self.blurSlider = QtWidgets.QSlider(self.centralwidget)
+        self.blurSlider.setOrientation(QtCore.Qt.Horizontal)
+        self.blurSlider.setObjectName("verticalSlider_2")
+        self.blurSlider.setValue(self.blur_value)
+        self.blurSlider.setMinimum(MIN_BLUR)
+        self.blurSlider.setMaximum(MAX_BLUR)
+        self.blurLabel = QLabel("Blur: " + str(self.blur_value))
+        self.blurLabel.setAlignment(Qt.AlignCenter)
+        self.verticalLayout.addWidget(self.blurLabel)
+        self.blurSlider.valueChanged.connect(self.updateValue)
+        self.verticalLayout.addWidget(self.blurSlider)
 
         # contrast slider
-        self.verticalSlider_3 = QtWidgets.QSlider(self.centralwidget)
-        self.verticalSlider_3.setOrientation(QtCore.Qt.Horizontal)
-        self.verticalSlider_3.setObjectName("verticalSlider_3")
-        self.l3 = QLabel("Contrast: " + str(self.contrast_value_now2))
-        self.l3.setAlignment(Qt.AlignCenter)
-        self.verticalLayout.addWidget(self.l3)
-        self.verticalSlider_3.valueChanged.connect(self.updateValue)
-        self.verticalLayout.addWidget(self.verticalSlider_3)
-        self.verticalSlider_3.valueChanged['int'].connect(self.contrast_value)
+        self.contrastSlider = QtWidgets.QSlider(self.centralwidget)
+        self.contrastSlider.setOrientation(QtCore.Qt.Horizontal)
+        self.contrastSlider.setObjectName("verticalSlider_3")
+        self.contrastSlider.setValue(self.contrast_value)
+        self.contrastSlider.setMinimum(MIN_CONTRAST)
+        self.contrastSlider.setMaximum(MAX_CONTRAST)
+        self.contrastLabel = QLabel("Contrast: " + str(self.contrast_value))
+        self.contrastLabel.setAlignment(Qt.AlignCenter)
+        self.verticalLayout.addWidget(self.contrastLabel)
+        self.contrastSlider.valueChanged.connect(self.updateValue)
+        self.verticalLayout.addWidget(self.contrastSlider)
 
         layout = self.verticalLayout
-        self.l4 = QLabel("Red: " + str(INIT_VAL))
-        self.l4.setAlignment(Qt.AlignCenter)
-        layout.addWidget(self.l4)
+        self.redLabel = QLabel("Red: " + str(INIT_RGBVAL))
+        self.redLabel.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.redLabel)
 
-        self.sl4 = QSlider(Qt.Horizontal)
-        self.sl4.setMinimum(MIN_VAL)
-        self.sl4.setMaximum(MAX_VAL)
-        self.sl4.setValue(INIT_VAL)
-        self.sl4.valueChanged.connect(self.valuechange)
-        layout.addWidget(self.sl4)
+        self.redSlider = QSlider(Qt.Horizontal)
+        self.redSlider.setMinimum(MIN_RGBVAL)
+        self.redSlider.setMaximum(MAX_RGBVAL)
+        self.redSlider.setValue(INIT_RGBVAL)
+        self.redSlider.valueChanged.connect(self.valuechange)
+        layout.addWidget(self.redSlider)
 
-        self.l5 = QLabel("Green: " + str(INIT_VAL))
-        self.l5.setAlignment(Qt.AlignCenter)
-        layout.addWidget(self.l5)
+        self.greenLabel = QLabel("Green: " + str(INIT_RGBVAL))
+        self.greenLabel.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.greenLabel)
 
-        self.sl5 = QSlider(Qt.Horizontal)
-        self.sl5.setMinimum(MIN_VAL)
-        self.sl5.setMaximum(MAX_VAL)
-        self.sl5.setValue(INIT_VAL)
-        self.sl5.valueChanged.connect(self.valuechange)
-        layout.addWidget(self.sl5)
+        self.greenSlider = QSlider(Qt.Horizontal)
+        self.greenSlider.setMinimum(MIN_RGBVAL)
+        self.greenSlider.setMaximum(MAX_RGBVAL)
+        self.greenSlider.setValue(INIT_RGBVAL)
+        self.greenSlider.valueChanged.connect(self.valuechange)
+        layout.addWidget(self.greenSlider)
 
-        self.l6 = QLabel("Blue: " + str(INIT_VAL))
-        self.l6.setAlignment(Qt.AlignCenter)
-        layout.addWidget(self.l6)
+        self.blueLabel = QLabel("Blue: " + str(INIT_RGBVAL))
+        self.blueLabel.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.blueLabel)
 
-        self.sl6 = QSlider(Qt.Horizontal)
-        self.sl6.setMinimum(MIN_VAL)
-        self.sl6.setMaximum(MAX_VAL)
-        self.sl6.setValue(INIT_VAL)
-        self.sl6.valueChanged.connect(self.valuechange)
-        layout.addWidget(self.sl6)
+        self.blueSlider = QSlider(Qt.Horizontal)
+        self.blueSlider.setMinimum(MIN_RGBVAL)
+        self.blueSlider.setMaximum(MAX_RGBVAL)
+        self.blueSlider.setValue(INIT_RGBVAL)
+        self.blueSlider.valueChanged.connect(self.valuechange)
+        layout.addWidget(self.blueSlider)
 
         # auto-enhance button
         self.autoEnhanceButton = QtWidgets.QPushButton(self.centralwidget)
@@ -259,13 +270,15 @@ class Ui_MainWindow(QWidget):
         self.isEnhanced=False
 
     def updateValue(self):
-        self.brightness_value_now2 = self.verticalSlider.value()
-        self.blur_value_now2 = self.verticalSlider_2.value()
-        self.contrast_value_now2 = self.verticalSlider_3.value()
+        self.brightness_value = self.brightnessSlider.value()
+        self.blur_value = self.blurSlider.value()
+        self.contrast_value = self.contrastSlider.value()
 
-        self.l1.setText("Brightness: " + str(self.brightness_value_now2))
-        self.l2.setText("Blur: " + str(self.blur_value_now2))
-        self.l3.setText("Contrast: " + str(self.contrast_value_now2))
+        self.brightnessLabel.setText("Brightness: " + str(self.brightness_value))
+        self.blurLabel.setText("Blur: " + str(self.blur_value))
+        self.contrastLabel.setText("Contrast: " + str(self.contrast_value))
+
+        self.update()
 
     def loadImage(self):
         self.filename = QFileDialog.getOpenFileName(filter="Image (*.*)")[0]
@@ -281,26 +294,23 @@ class Ui_MainWindow(QWidget):
         image = QImage(frame, frame.shape[1],frame.shape[0],frame.strides[0],QImage.Format_RGB888)
         self.label.setPixmap(QtGui.QPixmap.fromImage(image))
     
-    def brightness_value(self,value):
+    # def brightness_value(self,value):
 
-        self.brightness_value_now = value
-        self.update()
+    #     self.brightness_value_now = value
         
-    def blur_value(self,value):
+    # def blur_value(self,value):
 
-        self.blur_value_now = value
-        self.update()
+    #     self.blur_value_now = value
     
-    def contrast_value(self,value):
-        self.contrast_value_now = value
-        self.update()
+    # def contrast_value(self,value):
+    #     self.contrast_value_now = value
     
     def update(self):
 
-        brightness = np.interp(self.brightness_value_now, [-100, 100], [-255, 255]).astype(np.int64)
+        brightness = np.interp(self.brightness_value, [-100, 100], [-255, 255]).astype(np.int64)
         img = ip.changeBrightness(self.image, brightness)
-        img = ip.changeBlur(img,self.blur_value_now)
-        img = ip.changeContrast(img,self.contrast_value_now)
+        img = ip.changeBlur(img,self.blur_value)
+        img = ip.changeContrast(img,self.contrast_value)
 
         img = ip.channel_correction(img.copy(
         ), (0, 1, 2), (self.r_val / 100, self.g_val / 100, self.b_val / 100))
@@ -324,12 +334,12 @@ class Ui_MainWindow(QWidget):
         
     
     def valuechange(self):
-        self.r_val = self.sl4.value()
-        self.g_val = self.sl5.value()
-        self.b_val = self.sl6.value()
-        self.l4.setText("Red: " + str(self.r_val))
-        self.l5.setText("Green: " + str(self.g_val))
-        self.l6.setText("Blue: " + str(self.b_val))
+        self.r_val = self.redSlider.value()
+        self.g_val = self.greenSlider.value()
+        self.b_val = self.blueSlider.value()
+        self.redLabel.setText("Red: " + str(self.r_val))
+        self.greenLabel.setText("Green: " + str(self.g_val))
+        self.blueLabel.setText("Blue: " + str(self.b_val))
         # self.updateImage()
         self.update()
 
