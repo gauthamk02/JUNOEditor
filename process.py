@@ -33,6 +33,7 @@ class Ui_MainWindow(QWidget):
         self.r_val = INIT_VAL
         self.g_val = INIT_VAL
         self.b_val = INIT_VAL
+        
 
     def setupUi(self):
         
@@ -45,6 +46,8 @@ class Ui_MainWindow(QWidget):
         self.blur_value_now2 = 0
         self.contrast_value_now = 0 
         self.contrast_value_now2 = 0
+        self.channels=["RED","GREEN","BLUE"]
+        self.selectedChannel="RED"
 
         self.image=cv2.imread("ImageSet/dummyBlack.jpg", 0)
         MainWindow.setObjectName("MainWindow")
@@ -55,22 +58,8 @@ class Ui_MainWindow(QWidget):
         self.gridLayout_2 = QtWidgets.QGridLayout(self.centralwidget)
         self.gridLayout_2.setObjectName("gridLayout_2")
 
-        self.horizontalLayout = QtWidgets.QVBoxLayout()
-        self.horizontalLayout.setObjectName("horizontalLayout")
-
-        # dropdown for rgb channel selection
-        self.combo_box = QComboBox(self)
-        self.combo_box.setGeometry(100, 100, 100, 30)
-        self.combo_box.addItem("Red")
-        self.combo_box.addItem("Green")
-        self.combo_box.addItem("Blue")
-        self.horizontalLayout.addWidget(self.combo_box)
-
-        #  button for selecting rgb channel
-        self.rgbChannelButton = QtWidgets.QPushButton(self.centralwidget)
-        self.rgbChannelButton.setObjectName("rgbChannelButton")
-        self.rgbChannelButton.setText("Select Channel")
-        self.horizontalLayout.addWidget(self.rgbChannelButton)
+        self.verticalLayout = QtWidgets.QVBoxLayout()
+        self.verticalLayout.setObjectName("verticalLayout")
 
         # brightness slider
         self.verticalSlider = QtWidgets.QSlider(self.centralwidget)
@@ -79,9 +68,9 @@ class Ui_MainWindow(QWidget):
         self.verticalSlider.setValue(self.brightness_value_now2)
         self.l1 = QLabel("Brightness: " + str(self.brightness_value_now2))
         self.l1.setAlignment(Qt.AlignCenter)
-        self.horizontalLayout.addWidget(self.l1)
+        self.verticalLayout.addWidget(self.l1)
         self.verticalSlider.valueChanged.connect(self.updateValue)
-        self.horizontalLayout.addWidget(self.verticalSlider)
+        self.verticalLayout.addWidget(self.verticalSlider)
         self.verticalSlider.valueChanged['int'].connect(self.brightness_value)
         
         # blur slider
@@ -90,9 +79,9 @@ class Ui_MainWindow(QWidget):
         self.verticalSlider_2.setObjectName("verticalSlider_2")
         self.l2 = QLabel("Blur: " + str(self.blur_value_now2))
         self.l2.setAlignment(Qt.AlignCenter)
-        self.horizontalLayout.addWidget(self.l2)
+        self.verticalLayout.addWidget(self.l2)
         self.verticalSlider_2.valueChanged.connect(self.updateValue)
-        self.horizontalLayout.addWidget(self.verticalSlider_2)
+        self.verticalLayout.addWidget(self.verticalSlider_2)
         self.verticalSlider_2.valueChanged['int'].connect(self.blur_value)
 
         # contrast slider
@@ -101,12 +90,12 @@ class Ui_MainWindow(QWidget):
         self.verticalSlider_3.setObjectName("verticalSlider_3")
         self.l3 = QLabel("Contrast: " + str(self.contrast_value_now2))
         self.l3.setAlignment(Qt.AlignCenter)
-        self.horizontalLayout.addWidget(self.l3)
+        self.verticalLayout.addWidget(self.l3)
         self.verticalSlider_3.valueChanged.connect(self.updateValue)
-        self.horizontalLayout.addWidget(self.verticalSlider_3)
+        self.verticalLayout.addWidget(self.verticalSlider_3)
         self.verticalSlider_3.valueChanged['int'].connect(self.contrast_value)
 
-        layout = self.horizontalLayout
+        layout = self.verticalLayout
         self.l4 = QLabel("Red: " + str(INIT_VAL))
         self.l4.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.l4)
@@ -140,6 +129,25 @@ class Ui_MainWindow(QWidget):
         self.sl6.valueChanged.connect(self.valuechange)
         layout.addWidget(self.sl6)
 
+        self.horizontalLayout= QtWidgets.QHBoxLayout()
+        self.horizontalLayout.setObjectName("horizontalLayout")
+
+        # dropdown for rgb channel selection
+        self.combo_box = QComboBox(self)
+        self.combo_box.setObjectName("combo_box")
+        self.combo_box
+        self.combo_box.setGeometry(100, 100, 100, 50)
+        for channel in self.channels:
+            self.combo_box.addItem(channel)
+        self.horizontalLayout.addWidget(self.combo_box)
+        self.combo_box.activated[int].connect(self.RGBChannelActivated)
+
+        #  button for selecting rgb channel
+        self.rgbChannelButton = QtWidgets.QPushButton(self.centralwidget)
+        self.rgbChannelButton.setObjectName("rgbChannelButton")
+        self.rgbChannelButton.setText("Alter Channel")
+        self.horizontalLayout.addWidget(self.rgbChannelButton)
+
         # --- buttons -------
 
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
@@ -150,11 +158,11 @@ class Ui_MainWindow(QWidget):
         self.pushButton_2.setObjectName("pushButton_2")
         self.horizontalLayout_2.addWidget(self.pushButton_2)
 
-        if self.label:
+        
         # save button
-            self.pushButton = QtWidgets.QPushButton(self.centralwidget)
-            self.pushButton.setObjectName("pushButton")
-            self.horizontalLayout_2.addWidget(self.pushButton)
+        self.pushButton = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton.setObjectName("pushButton")
+        self.horizontalLayout_2.addWidget(self.pushButton)
 
         #  button for selecting rgb channel
         self.pushButton_3 = QtWidgets.QPushButton(self.centralwidget)
@@ -169,7 +177,7 @@ class Ui_MainWindow(QWidget):
         # image area
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
-        self.horizontalLayout_3.addLayout(self.horizontalLayout)
+        self.horizontalLayout_3.addLayout(self.verticalLayout)
         self.horizontalLayout_3.setContentsMargins(0,0,0,0)
         # self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setText("Upload Image")
@@ -177,7 +185,8 @@ class Ui_MainWindow(QWidget):
         self.horizontalLayout_3.addWidget(self.label)
 
         self.gridLayout = QtWidgets.QGridLayout()
-        self.gridLayout.addLayout(self.horizontalLayout_2, 1, 0, 4, 1)
+        self.gridLayout.addLayout(self.horizontalLayout, 1, 0, 1, 1)
+        self.gridLayout.addLayout(self.horizontalLayout_2, 2, 0, 4, 1)
         self.gridLayout.addLayout(self.horizontalLayout_3, 0, 0, 1, 0)
         
         
@@ -197,11 +206,17 @@ class Ui_MainWindow(QWidget):
         
         QtCore.QMetaObject.connectSlotsByName(MainWindow)   
 
+
+    def RGBChannelActivated(self,idx):
+        print(self.channels[idx], " Channel Activated")
+        self.selectedChannel = self.channels[idx]
+
     def retranslateUi2(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.pushButton_3.setText(_translate("MainWindow", "Proceed"))
         self.pushButton_3.clicked.connect(self.takeinputs)
+
 
     def takeinputs(self):
         name, done1 = QtWidgets.QInputDialog.getText(
@@ -214,15 +229,15 @@ class Ui_MainWindow(QWidget):
               self, 'Input Dialog', 'Blue Channel:')
  
         langs =['C', 'c++', 'Java', 'Python', 'Javascript']
-        lang, done4 = QtWidgets.QInputDialog.getItem(
-          self, 'Input Dialog', 'Language you know:', langs)
+        # lang, done4 = QtWidgets.QInputDialog.getItem(
+        #   self, 'Input Dialog', 'Language you know:', langs)
  
-        if done1 and done2 and done3 and done4 :
+        if done1 and done2 and done3  :
              # Showing confirmation message along
              # with information provided by user.
-             self.label.setText('Information stored Successfully\nName: '
-                                 +str(name)+'('+str(roll)+')'+'\n'+'CGPA: '
-                                 +str(cgpa)+'\nSelected Language: '+str(lang))  
+            #  self.label.setText('Information stored Successfully\nName: '
+            #                      +str(name)+'('+str(roll)+')'+'\n'+'CGPA: '
+            #                      +str(cgpa)+'\nSelected Language: '+str(lang))  
   
              # Hide the pushbutton after inputs provided by the use.
              self.pushButton.hide()          
@@ -362,6 +377,14 @@ if __name__ == "__main__":
             border: 2px solid #fff;
             border-radius: 8px;
         }
+        QComboBox{
+            color: #fff;
+            padding: 10px;
+        }
+        QComboBox::drop-down {
+            
+            margin: 6px;
+            }
     """
     app.setStyleSheet(style)
     MainWindow = QtWidgets.QMainWindow()
