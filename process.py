@@ -35,8 +35,9 @@ class Ui_MainWindow(QWidget):
 
         super(Ui_MainWindow, self).__init__(parent)
 
-        self.image = np.array(cv2.imread("ImageSet/dummyBlack.jpg"))
-        self.isEnhanced = False
+        self.image = cv2.imread("ImageSet/dummyBlack.jpg")
+        self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
+        self.image = np.array(self.image)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.initState()
@@ -57,11 +58,9 @@ class Ui_MainWindow(QWidget):
          # Added code here  
         self.filename = None 
         self.tmp = None 
-        self.tempImg=cv2.imread("ImageSet/dummyBlack.jpg", 0)
         self.channels=["RED","GREEN","BLUE"]
         self.selectedChannel="RED"
 
-        self.image=cv2.imread("ImageSet/dummyBlack.jpg", 0)
         MainWindow.setObjectName("MainWindow")
         MainWindow.setFixedSize(1000, 800)
 
@@ -78,8 +77,8 @@ class Ui_MainWindow(QWidget):
         self.brightnessSlider.setOrientation(QtCore.Qt.Horizontal)
         self.brightnessSlider.setObjectName("verticalSlider")
         self.brightnessSlider.setValue(self.brightness_value)
-        self.brightnessSlider.setMinimum(-100)
-        self.brightnessSlider.setMaximum(100)
+        self.brightnessSlider.setMinimum(MIN_BRIGHTNESS)
+        self.brightnessSlider.setMaximum(MAX_BRIGHTNESS)
         self.brightnessLabel = QLabel("Brightness: " + str(self.brightness_value))
         self.brightnessLabel.setAlignment(Qt.AlignCenter)
         self.verticalLayout.addWidget(self.brightnessLabel)
@@ -159,7 +158,6 @@ class Ui_MainWindow(QWidget):
         # dropdown for rgb channel selection
         self.combo_box = QComboBox(self)
         self.combo_box.setObjectName("combo_box")
-        self.combo_box
         self.combo_box.setGeometry(100, 100, 100, 50)
         for channel in self.channels:
             self.combo_box.addItem(channel)
@@ -167,11 +165,11 @@ class Ui_MainWindow(QWidget):
         self.combo_box.activated[int].connect(self.RGBChannelActivated)
 
         #  button for selecting rgb channel
-        self.pushButton_3 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_3.setObjectName("pushButton_3")
-        self.pushButton_3.setText("Alter Channel")
-        self.horizontalLayout.addWidget(self.pushButton_3)
-        self.pushButton_3.clicked.connect(self.takeinputs)
+        self.alterChannelButton = QtWidgets.QPushButton(self.centralwidget)
+        self.alterChannelButton.setObjectName("pushButton_3")
+        self.alterChannelButton.setText("Alter Channel")
+        self.horizontalLayout.addWidget(self.alterChannelButton)
+        self.alterChannelButton.clicked.connect(self.takeinputs)
 
         # --- buttons -------
 
@@ -216,7 +214,6 @@ class Ui_MainWindow(QWidget):
         self.gridLayout.addLayout(self.horizontalLayout_2, 2, 0, 4, 1)
         self.gridLayout.addLayout(self.horizontalLayout_3, 0, 0, 1, 0)
         
-        
         self.gridLayout.setObjectName("gridLayout")
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.gridLayout.addItem(spacerItem, 1, 1, 1, 1)
@@ -233,8 +230,6 @@ class Ui_MainWindow(QWidget):
         print(self.channels[idx], " Channel Activated")
         self.selectedChannel = self.channels[idx]
 
-
-
     def takeinputs(self):
 
         msg=QMessageBox()
@@ -243,21 +238,8 @@ class Ui_MainWindow(QWidget):
         slider=QSlider(Qt.Horizontal)
         msg.addAction(slider)
         msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-        msg.exec_()
-
-        # name, done1 = QtWidgets.QInputDialog.getText(
-        #      self, 'Input Dialog'resetImage, 'Red Channel:')
-        
-        # pop=ColorCurvePopUp(self)
-        # pop.show()
-
-        # self.optionsLayout = QtWidgets.QVBoxLayout(self)
-        # sl5 = QSlider(Qt.Horizontal).setMaximum(100)
-        # self.optionsLayout.addWidget(sl5)
-        
-        # self.pushButton.hide()          
+        msg.exec_()        
                
-    
     def autoEnhance(self):
         if(self.isEnhanced == False):
             img = ip.auto_enhance(self.image)
@@ -267,16 +249,21 @@ class Ui_MainWindow(QWidget):
 
     def resetSlider(self):
         self.redSlider.setValue(INIT_RGBVAL)
+        self.redLabel.setText("Red: " + str(INIT_RGBVAL))
         self.greenSlider.setValue(INIT_RGBVAL)
+        self.greenLabel.setText("Green: " + str(INIT_RGBVAL))
         self.blueSlider.setValue(INIT_RGBVAL)
+        self.blueLabel.setText("Blue: " + str(INIT_RGBVAL))
 
         self.contrastSlider.setValue(INIT_CONTRAST)
+        self.contrastLabel.setText("Contrast: " + str(INIT_CONTRAST))
         self.brightnessSlider.setValue(INIT_BRIGHTNESS)
-        # self.saturationSlider.setValue(INIT_SATURATION)
-        self.blueSlider.setValue(INIT_BLUR)
+        self.brightnessLabel.setText("Brightness: " + str(INIT_BRIGHTNESS))
+        self.blurSlider.setValue(INIT_BLUR)
+        self.blurLabel.setText("Blur: " + str(INIT_BLUR))
 
     def resetImage(self):
-        self.image = self.tempImg
+        self.image = self.origImg
         self.setPhoto(self.image)
         
         self.initState()
@@ -296,30 +283,19 @@ class Ui_MainWindow(QWidget):
     def loadImage(self):
         self.filename = QFileDialog.getOpenFileName(filter="Image (*.*)")[0]
         self.image = cv2.imread(self.filename)
-        self.tempImg = self.image
-        self.isEnhanced=False
+        self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
+        self.image = np.array(self.image)
+        self.origImg = self.image
+        self.initState()
         self.setPhoto(self.image)
     
     def setPhoto(self,image):
         self.tmp = image
         image = imutils.resize(image,width=640)
-        frame = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        image = QImage(frame, frame.shape[1],frame.shape[0],frame.strides[0],QImage.Format_RGB888)
+        image = QImage(image, image.shape[1],image.shape[0],image.strides[0],QImage.Format_RGB888)
         self.label.setPixmap(QtGui.QPixmap.fromImage(image))
     
-    # def brightness_value(self,value):
-
-    #     self.brightness_value_now = value
-        
-    # def blur_value(self,value):
-
-    #     self.blur_value_now = value
-    
-    # def contrast_value(self,value):
-    #     self.contrast_value_now = value
-    
     def update(self):
-
         brightness = np.interp(self.brightness_value, [-100, 100], [-255, 255]).astype(np.int64)
         img = ip.changeBrightness(self.image, brightness)
         img = ip.changeBlur(img,self.blur_value)
@@ -342,9 +318,8 @@ class Ui_MainWindow(QWidget):
         MainWindow.setWindowTitle(_translate("MainWindow", "JUNO Photo Editor"))
         self.pushButton_2.setText(_translate("MainWindow", "Open"))
         self.pushButton.setText(_translate("MainWindow", "Save"))
-        self.pushButton_3.setText(_translate("MainWindow", "Alter Channel"))
+        self.alterChannelButton.setText(_translate("MainWindow", "Alter Channel"))
         self.pushButton_4.setText(_translate("MainWindow", "Reset Image"))
-        
     
     def valuechange(self):
         self.r_val = self.redSlider.value()
@@ -353,7 +328,6 @@ class Ui_MainWindow(QWidget):
         self.redLabel.setText("Red: " + str(self.r_val))
         self.greenLabel.setText("Green: " + str(self.g_val))
         self.blueLabel.setText("Blue: " + str(self.b_val))
-        # self.updateImage()
         self.update()
 
 if __name__ == "__main__":
