@@ -40,6 +40,7 @@ class Ui_MainWindow(QWidget):
 
         super(Ui_MainWindow, self).__init__(parent)
 
+        self.onlyRGB = True
         self.image = cv2.imread("ImageSet/dummyBlack.jpg")
         self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
         self.image = np.array(self.image)
@@ -174,10 +175,10 @@ class Ui_MainWindow(QWidget):
         layout.addWidget(self.autoEnhanceButton)
         self.autoEnhanceButton.clicked.connect(self.autoEnhance)
 
-        # radio buttons ki kundali
-        self.label1 = QLabel('would u want to touch anshuman?')
-        self.rbtn1 = QRadioButton('yes')
-        self.rbtn2 = QRadioButton('absolutely')
+        # radio buttons 
+        self.label1 = QLabel('Give the image input type?')
+        self.rbtn1 = QRadioButton('Single RGB image')
+        self.rbtn2 = QRadioButton('multiple RGB channel images')
         self.label2 = QLabel("")
         
         self.btngroup1 = QButtonGroup()
@@ -209,16 +210,19 @@ class Ui_MainWindow(QWidget):
         ## three images for rgb channels
         self.openButton_r = QtWidgets.QPushButton(self.centralwidget)
         self.openButton_r.setObjectName("openButton_r")
+        self.openButton_r.setText("Upload Red channel image")
         self.horizontalLayout_2.addWidget(self.openButton_r)
         # self.openButton_r.clicked.connect(self.loadImage_r)
 
         self.openButton_g = QtWidgets.QPushButton(self.centralwidget)
         self.openButton_g.setObjectName("openButton_g")
+        self.openButton_g.setText("Upload Green channel image")
         self.horizontalLayout_2.addWidget(self.openButton_g)
         # self.openButton_g.clicked.connect(self.loadImage_g)
 
         self.openButton_b = QtWidgets.QPushButton(self.centralwidget)
         self.openButton_b.setObjectName("openButton_b")
+        self.openButton_b.setText("Upload Blue channel image")
         self.horizontalLayout_2.addWidget(self.openButton_b)
         # self.openButton_b.clicked.connect(self.loadImage_b)
         
@@ -266,7 +270,18 @@ class Ui_MainWindow(QWidget):
     def onClickedCity(self):
         radioBtn = self.sender()
         if radioBtn.isChecked():
-            self.label2.setText("You selected option " + radioBtn.text())
+            self.label2.setText("You selected for " + radioBtn.text()+" upload")
+            if radioBtn.text() == "Single RGB image":
+                self.openButton.show()
+                self.openButton_r.hide()
+                self.openButton_g.hide()
+                self.openButton_b.hide()
+            else:
+                self.onlyRGB = False
+                self.openButton_r.show()
+                self.openButton_g.show()
+                self.openButton_b.show()
+                self.openButton.hide()
 
     def RGBChannelActivated(self,idx):
         print(self.channels[idx], " Channel Activated")
@@ -388,7 +403,7 @@ class Ui_MainWindow(QWidget):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "JUNO Photo Editor"))
-        self.openButton.setText(_translate("MainWindow", "Open"))
+        self.openButton.setText(_translate("MainWindow", "Upload Image"))
         self.pushButton.setText(_translate("MainWindow", "Save"))
         self.pushButton_4.setText(_translate("MainWindow", "Reset Image"))
 
@@ -448,6 +463,10 @@ if __name__ == "__main__":
         QComboBox::drop-down {
             margin: 6px;
             }
+        QRadioButton {
+            color: #fff;
+        }
+        
     """
     app.setStyleSheet(style)
     MainWindow = QtWidgets.QMainWindow()
