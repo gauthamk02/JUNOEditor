@@ -50,6 +50,7 @@ class Ui_MainWindow(QWidget):
         self.imagesLoaded = [False, False, False]
         self.image = np.zeros((1600,1600,3), np.uint8)
         self.origImg = np.zeros((1600,1600,3), np.uint8)
+        self.tempImg = np.zeros((1600,1600,3), np.uint8)
         self.image_r = None
         self.image_g = None
         self.image_b = None
@@ -192,6 +193,14 @@ class Ui_MainWindow(QWidget):
         self.blueSlider.valueChanged.connect(self.valuechange)
         layout.addWidget(self.blueSlider)
 
+        self.rbtn3 = QRadioButton('See original Image')
+        self.btngroup2 = QButtonGroup()
+        self.btngroup2.addButton(self.rbtn3)
+        self.rbtn3.toggle()
+        # self.rbtn3.setCheckable(False)
+        self.rbtn3.toggled.connect(self.previewImage)
+        layout.addWidget(self.rbtn3)
+
         # auto-enhance button
         self.autoEnhanceButton = QtWidgets.QPushButton(self.centralwidget)
         self.autoEnhanceButton.setObjectName("autoEnhanceButton")
@@ -328,6 +337,16 @@ class Ui_MainWindow(QWidget):
         self.imageLoaded = False
         self.imagesLoaded = [False, False, False]
         self.displayPhoto(self.image)
+    
+    def previewImage(self):
+        if self.rbtn3.isChecked():
+            if self.rbtn3.text() == "See original Image":
+                self.tempImg = self.image
+                self.displayPhoto(self.origImg)
+                # self.rbtn3.setChecked(True)
+            else:
+                self.displayPhoto(self.tempImg)
+                # self.rbtn3.setChecked(False)
 
     def RGBChannelActivated(self,idx):
         print(self.channels[idx], " Channel Activated")
@@ -392,6 +411,7 @@ class Ui_MainWindow(QWidget):
 
     def loadImage(self):
         self.filename = QFileDialog.getOpenFileName(filter="Image (*.*)")[0]
+        self.rbtn3.setCheckable(False)
         self.image = cv2.imread(self.filename)
         self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
         self.image = np.array(self.image)
