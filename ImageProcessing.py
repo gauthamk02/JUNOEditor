@@ -17,7 +17,8 @@ class Processing:
         target_bins = np.arange(255)
         target_freq = np.linspace(0, 1, len(target_bins))
         new_vals = np.interp(freq, target_freq, target_bins)
-        return new_vals[image_intensity].astype(np.uint8)
+        linear_dist = new_vals[image_intensity].astype(np.uint8)
+        return linear_dist
 
     def auto_enhance(image):
         img = image.copy()
@@ -58,8 +59,7 @@ class Processing:
         return img
 
     def changeSharpness(img,value):
-        kernel = np.array([[-1,-1,-1], [-1,((value/10)+1),-1], [-1,-1,-1]])
-        img = cv2.filter2D(img, -1, kernel)
-        return img
+        img = ImageEnhance.Sharpness(Image.fromarray(img)).enhance((value + 100) / 100)
+        return np.array(img)
 
     

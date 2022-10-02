@@ -47,7 +47,7 @@ class Ui_MainWindow(QWidget):
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.initState()
         self.setupUi()
-        self.setPhoto(self.image)
+        self.displayPhoto(self.image)
 
     def initState(self):
         self.r_val = INIT_RGBVAL
@@ -254,20 +254,16 @@ class Ui_MainWindow(QWidget):
         msg.setWindowTitle("Input Dialog")
         msgStr="Color curver value for "+self.selectedChannel+" Channel"
         msg.setText(msgStr)
-        # slider=QSlider(Qt.Horizontal)
-        # msg.addAction(slider)
         msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
         msg.exec_()        
                
     def autoEnhance(self):
         if(self.isEnhanced == False):
-            self.resetSlider()
-            img = ip.auto_enhance(self.image)
-            self.isEnhanced=True
+            img = ip.auto_enhance(self.origImg)
+            self.isEnhanced = True
             self.image = img
-            self.setPhoto(img)
+            self.displayPhoto(img)
             
-
     def resetSlider(self):
         self.redSlider.setValue(INIT_RGBVAL)
         self.redLabel.setText("Red: " + str(INIT_RGBVAL))
@@ -287,7 +283,7 @@ class Ui_MainWindow(QWidget):
 
     def resetImage(self):
         self.image = self.origImg
-        self.setPhoto(self.image)
+        self.displayPhoto(self.image)
         
         self.initState()
         self.resetSlider()
@@ -312,9 +308,9 @@ class Ui_MainWindow(QWidget):
         self.image = np.array(self.image)
         self.origImg = self.image
         self.initState()
-        self.setPhoto(self.image)
+        self.displayPhoto(self.image)
     
-    def setPhoto(self,image):
+    def displayPhoto(self,image):
         self.tmp = image
         image = imutils.resize(image,width=640)
         image = QImage(image, image.shape[1],image.shape[0],image.strides[0],QImage.Format_RGB888)
@@ -322,7 +318,7 @@ class Ui_MainWindow(QWidget):
     
     def update(self):
         brightness = np.interp(self.brightness_value, [-100, 100], [-255, 255]).astype(np.int64)
-        img = ip.changeBrightness(self.image, brightness)
+        img = ip.changeBrightness(self.origImg, brightness)
         img = ip.changeBlur(img,self.blur_value)
         img = ip.changeContrast(img,self.contrast_value)
         img = ip.changeSharpness(img,self.sharpness_value)
@@ -330,14 +326,15 @@ class Ui_MainWindow(QWidget):
         img = ip.channel_correction(img.copy(
         ), (0, 1, 2), (self.r_val / 100, self.g_val / 100, self.b_val / 100))
 
-        self.setPhoto(img)
+        self.image = img
+        self.displayPhoto(img)
     
     def savePhoto(self):
         
         filename = QFileDialog.getSaveFileName(filter="JPG(*.jpg);;PNG(*.png);;TIFF(*.tiff);;BMP(*.bmp)")[0]
-        
-        cv2.imwrite(filename,self.tmp)
-        print('Image saved as:',self.filename)
+        img = cv2.cvtColor(self.image, cv2.COLOR_RGB2BGR)
+        cv2.imwrite(filename,img)
+        print('Image saved as:',filename)
     
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
