@@ -8,7 +8,6 @@ import cv2, imutils
 from ImageProcessing import Processing as ip
 import numpy as np
 import os
-from colorCurvePopUp import ColorCurvePopUp
 
 INIT_RGBVAL = 100
 MAX_RGBVAL = 100
@@ -34,6 +33,9 @@ INIT_SATURATION = 0
 MAX_SATURATION = 100
 MIN_SATURATION = 0
 
+WINDOW_HEIGHT = 800
+WINDOW_WIDTH = 1000
+
 os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = QLibraryInfo.location(
     QLibraryInfo.PluginsPath)
 
@@ -52,7 +54,7 @@ class Ui_MainWindow(QWidget):
         self.image_g = None
         self.image_b = None
         self.centralwidget = QtWidgets.QWidget(MainWindow)
-        self.label = QtWidgets.QLabel(self.centralwidget)
+        self.display_screen = QtWidgets.QLabel(self.centralwidget)
         self.initState()
         self.setupUi()
         self.displayPhoto(self.image)
@@ -80,7 +82,7 @@ class Ui_MainWindow(QWidget):
         self.selectedChannel="RED"
 
         MainWindow.setObjectName("MainWindow")
-        MainWindow.setFixedSize(1100, 800)
+        MainWindow.setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT)
 
         self.centralwidget.setObjectName("centralwidget")
 
@@ -233,19 +235,19 @@ class Ui_MainWindow(QWidget):
         ## three images for rgb channels
         self.openButton_r = QtWidgets.QPushButton(self.centralwidget)
         self.openButton_r.setObjectName("openButton_r")
-        self.openButton_r.setText("Upload Red channel image")
+        self.openButton_r.setText("Upload Red channel Img")
         self.horizontalLayout_2.addWidget(self.openButton_r)
         self.openButton_r.clicked.connect(self.loadImage_r)
 
         self.openButton_g = QtWidgets.QPushButton(self.centralwidget)
         self.openButton_g.setObjectName("openButton_g")
-        self.openButton_g.setText("Upload Green channel image")
+        self.openButton_g.setText("Upload Green channel Img")
         self.horizontalLayout_2.addWidget(self.openButton_g)
         self.openButton_g.clicked.connect(self.loadImage_g)
 
         self.openButton_b = QtWidgets.QPushButton(self.centralwidget)
         self.openButton_b.setObjectName("openButton_b")
-        self.openButton_b.setText("Upload Blue channel image")
+        self.openButton_b.setText("Upload Blue channel Img")
         self.horizontalLayout_2.addWidget(self.openButton_b)
         self.openButton_b.clicked.connect(self.loadImage_b)
         
@@ -275,9 +277,9 @@ class Ui_MainWindow(QWidget):
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         self.horizontalLayout_3.addLayout(self.verticalLayout)
         self.horizontalLayout_3.setContentsMargins(0,0,0,0)
-        self.label.setText("Upload Image")
-        self.label.setObjectName("label")
-        self.horizontalLayout_3.addWidget(self.label)
+        self.display_screen.setText("Upload Image")
+        self.display_screen.setObjectName("label")
+        self.horizontalLayout_3.addWidget(self.display_screen)
 
         self.gridLayout = QtWidgets.QGridLayout()
         self.gridLayout.addLayout(radioLayout, 1, 0, 1, 1)
@@ -471,9 +473,9 @@ class Ui_MainWindow(QWidget):
     
     def displayPhoto(self,image):
         self.tmp = image
-        image = imutils.resize(image,width=640)
+        image = imutils.resize(image, height=570)
         image = QImage(image, image.shape[1],image.shape[0],image.strides[0],QImage.Format_RGB888)
-        self.label.setPixmap(QtGui.QPixmap.fromImage(image))
+        self.display_screen.setPixmap(QtGui.QPixmap.fromImage(image))
     
     def update(self):
         brightness = np.interp(self.brightness_value, [-100, 100], [-255, 255]).astype(np.int64)

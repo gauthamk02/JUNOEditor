@@ -1,6 +1,5 @@
 from skimage import img_as_ubyte
-# from skimage.color import rgb2gray
-from skimage.exposure import histogram, cumulative_distribution
+from skimage.exposure import cumulative_distribution
 from PIL import Image, ImageEnhance
 import numpy as np
 import cv2
