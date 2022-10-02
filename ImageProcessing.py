@@ -57,4 +57,9 @@ class Processing:
         img = cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
         return img
 
+    def changeSharpness(img,value):
+        kernel = np.array([[-1,-1,-1], [-1,((value/10)+1),-1], [-1,-1,-1]])
+        img = cv2.filter2D(img, -1, kernel)
+        return img
+
     

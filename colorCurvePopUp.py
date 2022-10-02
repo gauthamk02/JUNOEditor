@@ -17,50 +17,50 @@ class ColorCurvePopUp(QToolButton):
         # self.slider.setWindowModality(Qt.NonModal)
         # self.slider.installEventFilter(self)
 
-    def isInside(self):
-        buttonRect = self.rect().translated(self.mapToGlobal(QPoint()))
-        if not self.slider.isVisible():
-            return QCursor.pos() in buttonRect
-        region = QRegion(buttonRect)
-        region |= QRegion(self.slider.geometry())
-        return region.contains(QCursor.pos())
+    # def isInside(self):
+    #     buttonRect = self.rect().translated(self.mapToGlobal(QPoint()))
+    #     if not self.slider.isVisible():
+    #         return QCursor.pos() in buttonRect
+    #     region = QRegion(buttonRect)
+    #     region |= QRegion(self.slider.geometry())
+    #     return region.contains(QCursor.pos())
 
-    def enterEvent(self, event):
-        if not self.slider.isVisible():
-            self.slider.move(self.mapToGlobal(QPoint()))
-            self.slider.show()
+    # def enterEvent(self, event):
+    #     if not self.slider.isVisible():
+    #         self.slider.move(self.mapToGlobal(QPoint()))
+    #         self.slider.show()
 
-    def leaveEvent(self, event):
-        if not self.isInside():
-            self.slider.hide()
+    # def leaveEvent(self, event):
+    #     if not self.isInside():
+    #         self.slider.hide()
 
-    def eventFilter(self, source, event):
-        if source == self.slider and event.type() == event.Leave:
-            if not self.isInside():
-                self.slider.hide()
-        return super().eventFilter(source, event)
+    # def eventFilter(self, source, event):
+    #     if source == self.slider and event.type() == event.Leave:
+    #         if not self.isInside():
+    #             self.slider.hide()
+    #     return super().eventFilter(source, event)
 
 
 
-    # def __init__(self, curveColor,parent):
-    #     super().__init__(parent)
-    #     MainWindow = QtWidgets.QMainWindow()
-    #     self.resize(600,300)
-    #     self.popUp(curveColor,MainWindow)
+    def __init__(self, curveColor,parent):
+        super().__init__(parent)
+        MainWindow = QtWidgets.QMainWindow()
+        self.resize(600,300)
+        self.popUp(curveColor,MainWindow)
        
 
-    # def popUp(self,curveColor,MainWindow):
-    #     print(curveColor)
+    def popUp(self,curveColor,MainWindow):
+        print(curveColor)
         
-    #     self.centralwidget = QtWidgets.QWidget(MainWindow)
-    #     self.label = QtWidgets.QLabel(self.centralwidget)
-    #     self.verticalLayout = QtWidgets.QVBoxLayout()
-    #     self.verticalLayout.setObjectName("verticalLayout")
+        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.label = QtWidgets.QLabel(self.centralwidget)
+        self.verticalLayout = QtWidgets.QVBoxLayout()
+        self.verticalLayout.setObjectName("verticalLayout")
 
-    #     self.verticalSlider = QtWidgets.QSlider(self.centralwidget)
-    #     self.verticalSlider.setOrientation(QtCore.Qt.Horizontal)
-    #     self.verticalSlider.setObjectName("verticalSlider")
-    #     self.verticalSlider.setValue(0)
-    #     self.verticalSlider.setMinimum(-100)
-    #     self.verticalSlider.setMaximum(100)
-    #     self.verticalLayout.addWidget(self.verticalSlider)
+        self.verticalSlider = QtWidgets.QSlider(self.centralwidget)
+        self.verticalSlider.setOrientation(QtCore.Qt.Horizontal)
+        self.verticalSlider.setObjectName("verticalSlider")
+        self.verticalSlider.setValue(0)
+        self.verticalSlider.setMinimum(-100)
+        self.verticalSlider.setMaximum(100)
+        self.verticalLayout.addWidget(self.verticalSlider)
