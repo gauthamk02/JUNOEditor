@@ -8,6 +8,7 @@ import cv2, imutils
 from ImageProcessing import Processing as ip
 import numpy as np
 import os
+from colorCurvePopUp import ColorCurvePopUp
 
 INIT_VAL = 100
 MAX_VAL = 100
@@ -23,6 +24,7 @@ class Ui_MainWindow(QWidget):
         super(Ui_MainWindow, self).__init__(parent)
 
         self.image = np.array(cv2.imread("ImageSet/dummyBlack.jpg"))
+        self.isEnhanced = False
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.setupUi()
@@ -131,6 +133,12 @@ class Ui_MainWindow(QWidget):
         self.sl6.valueChanged.connect(self.valuechange)
         layout.addWidget(self.sl6)
 
+        # auto-enhance button
+        self.autoEnhanceButton = QtWidgets.QPushButton(self.centralwidget)
+        self.autoEnhanceButton.setObjectName("autoEnhanceButton")
+        self.autoEnhanceButton.setText("Auto Enhance")
+        layout.addWidget(self.autoEnhanceButton)
+
         self.horizontalLayout= QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
 
@@ -155,12 +163,6 @@ class Ui_MainWindow(QWidget):
 
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-
-        # auto-enhance button
-        self.autoEnhanceButton = QtWidgets.QPushButton(self.centralwidget)
-        self.autoEnhanceButton.setObjectName("autoEnhanceButton")
-        self.autoEnhanceButton.setText("Auto Enhance")
-        self.horizontalLayout_2.addWidget(self.autoEnhanceButton)
 
         # open button
         self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget)
@@ -222,20 +224,34 @@ class Ui_MainWindow(QWidget):
 
 
     def takeinputs(self):
+
+        msg=QMessageBox()
+        msg.setWindowTitle("Input Dialog")
+        msg.setText("Color curver value for Red Channel")
+        slider=QSlider(Qt.Horizontal)
+        msg.addAction(slider)
+        msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        msg.exec_()
+
         # name, done1 = QtWidgets.QInputDialog.getText(
         #      self, 'Input Dialog', 'Red Channel:')
-        # self.optionsLayout=
-        self.optionsLayout = QtWidgets.QVBoxLayout(self)
-        sl5 = QSlider(Qt.Horizontal).setMaximum(100)
-        self.optionsLayout.addWidget(sl5)
+        
+        # pop=ColorCurvePopUp(self)
+        # pop.show()
+
+        # self.optionsLayout = QtWidgets.QVBoxLayout(self)
+        # sl5 = QSlider(Qt.Horizontal).setMaximum(100)
+        # self.optionsLayout.addWidget(sl5)
         
         # self.pushButton.hide()          
                
     
     def autoEnhance(self):
-        img = ip.auto_enhance(self.image)
-        self.image = img
-        self.setPhoto(img)
+        if(self.isEnhanced == False):
+            img = ip.auto_enhance(self.image)
+            self.isEnhanced=True
+            self.image = img
+            self.setPhoto(img)
 
     def updateValue(self):
         self.brightness_value_now2 = self.verticalSlider.value()
@@ -319,7 +335,7 @@ if __name__ == "__main__":
         QLabel{
             color: #fff;
         }
-        QSlider{
+        QSlider{MainWindow = QtWidgets.QMainWindow()
             height: 8px;
             margin: 15px 0;
         }
@@ -334,6 +350,7 @@ if __name__ == "__main__":
             background: #0577a8;
             border: 1px #DADADA solid;
             padding: 10px 15px;
+            margin: 10px 5px;
         }
         QPushButton:hover{
             border: 1px #C6C6C6 solid;
