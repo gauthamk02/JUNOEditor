@@ -34,7 +34,7 @@ MAX_SATURATION = 100
 MIN_SATURATION = 0
 
 WINDOW_HEIGHT = 800
-WINDOW_WIDTH = 1000
+WINDOW_WIDTH = 1200
 
 os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = QLibraryInfo.location(
     QLibraryInfo.PluginsPath)
@@ -192,6 +192,12 @@ class Ui_MainWindow(QWidget):
         self.blueSlider.valueChanged.connect(self.valuechange)
         layout.addWidget(self.blueSlider)
 
+
+        self.previewCheck = QCheckBox("Previous Image")
+        self.previewCheck.setChecked(False)
+        self.previewCheck.stateChanged.connect(self.previewImage)
+        layout.addWidget(self.previewCheck)
+
         # auto-enhance button
         self.autoEnhanceButton = QtWidgets.QPushButton(self.centralwidget)
         self.autoEnhanceButton.setObjectName("autoEnhanceButton")
@@ -319,6 +325,23 @@ class Ui_MainWindow(QWidget):
                 self.openButton.hide()
 
             self.imagesLoaded = [False, False, False]
+    
+    def previewImage(self):
+        if self.previewCheck.text()=="Previous Image":
+            self.tempImg = self.image
+            self.displayPhoto(self.origImg)
+            self.previewCheck.setText("back to normal")
+        else:
+            self.previewCheck.setText("Previous Image")
+            self.displayPhoto(self.tempImg)
+        # if self.rbtn3.isChecked():
+        #     if self.rbtn3.text() == "See original Image":
+        #         self.tempImg = self.image
+        #         self.displayPhoto(self.origImg)
+        #         # self.rbtn3.setChecked(True)
+        #     else:
+        #         self.displayPhoto(self.tempImg)
+        #         # self.rbtn3.setChecked(False)
     
     def discardImage(self):
         self.image = np.zeros((1600, 1600, 3), dtype=np.uint8)
@@ -560,6 +583,9 @@ if __name__ == "__main__":
         QComboBox::drop-down {
             margin: 6px;
             }
+        QCheckBox {
+            color: #fff;
+        }
         QRadioButton {
             color: #fff;
         }
